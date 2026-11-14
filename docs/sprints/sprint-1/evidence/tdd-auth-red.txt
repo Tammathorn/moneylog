@@ -1,0 +1,15 @@
+ ❯ loadAndTransform node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:51969:17
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  tests/unit/session.test.ts [ tests/unit/session.test.ts ]
+Error: Failed to load url ../../src/lib/session.js (resolved id: ../../src/lib/session.js) in /home/claude/moneylog/server/tests/api/auth.api.test.ts. Does the file exist?
+ ❯ loadAndTransform node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:51969:17
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+ Test Files  3 failed | 1 passed (4)
+      Tests  1 passed (1)
+   Start at  16:34:23
+   Duration  2.43s (transform 112ms, setup 0ms, collect 13ms, tests 246ms, environment 1ms, prepare 222ms)
+

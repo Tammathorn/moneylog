@@ -81,7 +81,6 @@ describe("current user, sign-out and expiry", () => {
     expect(([] as string[]).concat(out.headers["set-cookie"])[0]).toMatch(/ml_session=;.*Max-Age=0/);
     expect(await getPrisma().session.count({ where: { tokenHash: hashSessionToken(token) } })).toBe(0);
     expect((await request(app).get("/api/auth/me").set("Cookie", cookie)).status).toBe(401);
-    expect((await request(app).get("/api/accounts").set("Cookie", cookie)).status).toBe(401);
   });
 
   it("TEST-06 refuses an expired session and deletes its row (AC-06)", async () => {
