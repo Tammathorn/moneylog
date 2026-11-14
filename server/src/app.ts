@@ -7,6 +7,8 @@ import { originCheck } from "./middleware/auth.js";
 import { authRouter } from "./routes/auth.js";
 import { accountsRouter } from "./routes/accounts.js";
 import { transactionsRouter } from "./routes/transactions.js";
+import { summaryRouter } from "./routes/summary.js";
+import { adminRouter } from "./routes/admin.js";
 
 // Exported without listen() so Supertest can import it (index.ts starts the server).
 export const app = express();
@@ -28,6 +30,8 @@ app.get("/api/health", (_req, res) => {
 app.use("/api/auth", authRouter);
 app.use("/api/accounts", accountsRouter);
 app.use("/api/transactions", transactionsRouter);
+app.use("/api/summary", summaryRouter);
+app.use("/api/admin", adminRouter);
 
 app.use("/api", (_req, res) => sendError(res, 404, "NOT_FOUND", "That record was not found."));
 
