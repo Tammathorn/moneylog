@@ -1,0 +1,15 @@
+   × GET /api/accounts > TEST-16 returns only the caller's accounts, ordered by type then name, with balances (AC-14, BR-21) 9ms
+   × PUT /api/accounts/:id/opening-balance > TEST-21 sets the opening balance and the balance rises by it (AC-18) 4ms
+   × PUT /api/accounts/:id/opening-balance > TEST-22 refuses income/expense accounts and invalid values, leaving the value unchanged (AC-19, BR-09) 3ms
+ ✓ tests/unit/money.test.ts (3 tests) 41ms
+ FAIL  tests/unit/balances.test.ts [ tests/unit/balances.test.ts ]
+Error: Failed to load url ../../src/domain/balances.js (resolved id: ../../src/domain/balances.js) in /home/claude/moneylog/server/tests/unit/balances.test.ts. Does the file exist?
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  tests/api/accounts.api.test.ts > GET /api/accounts > TEST-16 returns only the caller's accounts, ordered by type then name, with balances (AC-14, BR-21)
+AssertionError: expected 404 to be 200 // Object.is equality
+ FAIL  tests/api/accounts.api.test.ts > PUT /api/accounts/:id/opening-balance > TEST-21 sets the opening balance and the balance rises by it (AC-18)
+TypeError: Cannot read properties of undefined (reading 'find')
+ FAIL  tests/api/accounts.api.test.ts > PUT /api/accounts/:id/opening-balance > TEST-22 refuses income/expense accounts and invalid values, leaving the value unchanged (AC-19, BR-09)
+AssertionError: expected 404 to be 422 // Object.is equality
+ Test Files  2 failed | 1 passed (3)
+      Tests  3 failed | 4 passed (7)
