@@ -1,0 +1,105 @@
+// MoneyLog data model - docs/system-sds.md section 2.
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum AccountType {
+  CASH
+  LOAN_GIVEN
+  LOAN_TAKEN
+  INCOME
+  EXPENSE
+}
+
+enum AccountSubtype {
+  WALLET
+  BANK
+  CREDIT_CARD
+  PERSONAL
+  OTHER
+}
+
+enum TransactionKind {
+  PAYMENT
+  RECEIPT
+}
+
+model User {
+  id           Int                @id @default(autoincrement())
+  email        String             @unique
+  displayName  String
+  role         Role
+  passwordHash String
+  isActive     Boolean            @default(true)
+  createdAt    DateTime           @default(now())
+  sessions     Session[]
+  accounts     Account[]
+  transactions MoneyTransaction[]
+}
+
+model Session {
+  id        Int      @id @default(autoincrement())
+  tokenHash String   @unique
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+
+  @@index([userId])
+}
+
+model Account {
+  id                   Int                @id @default(autoincrement())
+  userId               Int
+  user                 User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name                 String
+  type                 AccountType
+  subtype              AccountSubtype?
+  openingBalanceSatang Int                @default(0)
+  openingDate          DateTime?          @db.Date
+  isActive             Boolean            @default(true)
+  createdAt            DateTime           @default(now())
+  transactions         MoneyTransaction[]
+  lines                TransactionLine[]
+
+  @@unique([userId, name])
+}
+
+model MoneyTransaction {
+  id          Int               @id @default(autoincrement())
+  userId      Int
+  user        User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  kind        TransactionKind
+  accountId   Int
+  account     Account           @relation(fields: [accountId], references: [id])
+  date        DateTime          @db.Date
+  totalSatang Int
+  description String?
+  isFavourite Boolean           @default(false)
+  createdAt   DateTime          @default(now())
+  lines       TransactionLine[]
+
+  @@index([userId, date])
+}
+
+model TransactionLine {
+  id            Int              @id @default(autoincrement())
+  transactionId Int
+  transaction   MoneyTransaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+  accountId     Int
+  account       Account          @relation(fields: [accountId], references: [id])
+  amountSatang  Int
+  note          String?
+
+  @@unique([transactionId, accountId])
+}
