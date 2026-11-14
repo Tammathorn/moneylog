@@ -1,0 +1,50 @@
+Commit: d9f3a0aab4357c668b80ef597436ce228bff96fb  (2026-11-14 16:46:06 +0700)
+Branch: feature/7-ui-e2e
+
+== npm run build --prefix server
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.2
+npm notice To update run: npm install -g npm@12.2.2
+npm notice
+
+== npm run build --prefix client
+dist/index.html                   0.39 kB │ gzip:  0.27 kB
+dist/assets/index-D8aHCjfs.css    4.29 kB │ gzip:  1.47 kB
+dist/assets/index-BI72HDr0.js   187.69 kB │ gzip: 60.26 kB
+✓ built in 1.22s
+
+== npm test --prefix server
+ ✓ tests/api/transactions.api.test.ts (11 tests) 976ms
+ ✓ tests/api/auth.api.test.ts (7 tests) 738ms
+ ✓ tests/api/accounts.api.test.ts (4 tests) 518ms
+ ✓ tests/unit/transaction-rules.test.ts (11 tests) 27ms
+ ✓ tests/unit/summary.test.ts (3 tests) 4ms
+ ✓ tests/api/admin.api.test.ts (4 tests) 495ms
+ ✓ tests/unit/balances.test.ts (11 tests) 9ms
+ ✓ tests/api/access.api.test.ts (19 tests) 369ms
+ ✓ tests/api/summary.api.test.ts (3 tests) 534ms
+ ✓ tests/unit/transaction-input.test.ts (17 tests) 37ms
+ ✓ tests/unit/http-error.test.ts (1 test) 4ms
+ ✓ tests/unit/session.test.ts (2 tests) 4ms
+ ✓ tests/unit/money.test.ts (3 tests) 16ms
+ ✓ tests/unit/password.test.ts (1 test) 272ms
+ Test Files  14 passed (14)
+      Tests  97 passed (97)
+   Duration  10.26s (transform 353ms, setup 0ms, collect 1.83s, tests 4.00s, environment 3ms, prepare 793ms)
+
+== npm test --prefix client
+ ✓ tests/NewTransaction.test.tsx (1 test) 497ms
+   ✓ TEST-37 transaction form (AC-31) > updates Remaining live, enables Save only at zero, and keeps values on a server rule error 496ms
+ ✓ tests/AdminUsers.test.tsx (1 test) 135ms
+ ✓ tests/History.test.tsx (2 tests) 152ms
+ ✓ tests/Login.test.tsx (1 test) 285ms
+ ✓ tests/Accounts.test.tsx (1 test) 171ms
+ Test Files  5 passed (5)
+      Tests  6 passed (6)
+   Duration  4.96s (transform 219ms, setup 531ms, collect 504ms, tests 1.24s, environment 1.71s, prepare 257ms)
+
+== npx playwright test
+  ✓  1 [desktop-chromium] › e2e/access.spec.ts:5:5 › TEST-52 the administrator manages users but cannot reach financial data (1.4s)
+  ✓  2 [desktop-chromium] › e2e/access.spec.ts:21:5 › TEST-09 a disabled user cannot sign in (AC-02 via UI) (813ms)
+  ✓  3 [desktop-chromium] › e2e/journey.spec.ts:5:5 › TEST-50 alice logs a month of money and sees correct balances, summary and history (4.0s)
+  ✓  4 [desktop-chromium] › e2e/rules.spec.ts:5:5 › TEST-51 a 1,850.00 total with lines of 650.00 + 1,199.99 cannot be saved (1.4s)
+  4 passed (12.2s)
