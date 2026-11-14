@@ -1,0 +1,14 @@
+digraph G {
+  rankdir=LR; fontname="Helvetica"; node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=11, fillcolor="#EEF4F9", color="#1F5F8B"]; edge [fontname="Helvetica", fontsize=9, color="#555555"];
+  browser [label="Browser\nReact SPA (Vite build)\nscreens, forms, client hints", fillcolor="#FFFFFF"];
+  subgraph cluster_api { label="Node 22 / Express API  (one process in production)"; style="rounded,dashed"; color="#1F5F8B"; fontname="Helvetica"; fontsize=10;
+    mw [label="Middleware\noriginCheck → requireAuth\n→ requireRole"];
+    routes [label="Routes\n/auth /accounts /transactions\n/summary /admin/users"];
+    domain [label="Domain modules (pure TS)\nmoney · transaction rules\nbalance effects · summary", fillcolor="#E8F5EC", color="#1E7B4A"];
+    repo [label="Prisma client\nowner-scoped queries\nDB transactions"];
+    mw -> routes -> domain; routes -> repo;
+  }
+  db [label="PostgreSQL 16\nUser · Session · Account\nMoneyTransaction · TransactionLine", shape=cylinder, fillcolor="#FFF7E6", color="#B26B00"];
+  browser -> mw [label="HTTPS JSON /api/*\ncookie ml_session"];
+  repo -> db [label="SQL (pool)"];
+}
