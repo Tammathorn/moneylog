@@ -57,7 +57,7 @@ describe("POST /api/transactions - normal journeys", () => {
     expect(after["KTC Credit Card"] - before["KTC Credit Card"]).toBe(-100000);
     for (const name of ["Dining", "Groceries", "Electricity", "Telecom"]) expect(after[name]).toBe(before[name]);
     const summaryAfter = (await a.agent.get("/api/summary")).body;
-    if (summaryBefore.expenseSatang !== undefined) expect(summaryAfter.expenseSatang).toBe(summaryBefore.expenseSatang);
+    expect(summaryAfter.expenseSatang).toBe(summaryBefore.expenseSatang);
   });
 
   it("TEST-27 salary received increases bank and Salary (AC-24)", async () => {
