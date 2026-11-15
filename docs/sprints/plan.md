@@ -1,0 +1,38 @@
+# MoneyLog — Three-Sprint Plan
+
+Version 1.0 (2026-11-14). Feature IDs: `docs/features.md`.
+
+| Sprint | Goal | Features | Depends on | Completion outcome | Checkpoint |
+|---|---|---|---|---|---|
+| 1 | A signed-in user can log real money movements and immediately see correct balances, debt, income/expense and history; the admin controls who may sign in; nobody sees anyone else's money. | F-01, F-02, F-03, F-04, F-05, F-06, F-07, F-08 | — | Release `v0.1.0` on `main`: the stakeholder's Sprint 1 journey (opening bank balance → salary → split card purchase → card repayment → balances/summary/history) works through UI, API and DB; rule rejections and access restrictions are covered by automated tests. | Deliverable 1 |
+| 2 | Users run their own books end to end: create/archive accounts, correct mistakes, find past records, reuse frequent transactions, track loans. The Sprint 1 release is deployed through the pipeline. | F-09, F-10, F-11, F-12, F-13, F-14 | F-14 needs the Sprint 1 release; F-10/F-12 reuse the F-05 validation module; F-13 reuses the F-03 balance engine | Release `v0.2.0` deployed to Cloud Run from `main` by CI/CD; all FR-13–FR-19 accepted by AC/tests; Lab 6 UAT defects triaged. | Deliverable 2 (29 Nov) |
+| 3 | Complete and harden: reports, credential administration, performance, accessibility, rate limiting, regression. | F-15, F-16, F-17 | F-15 extends F-07 summary queries; F-16 extends F-01/F-08; F-17 covers everything | Release `v1.0.0`: every FR/BR/NFR traced to a passing test or justified manual check; defects from Labs 6–7 closed or disclosed. | Progress 29 Nov; complete 13 Dec |
+
+## Sprint 1 scope and why it is feasible
+
+Sprint 1 is the stakeholder's own example and nothing more. Accounts are **seeded** (AS-03);
+creating them is F-09 in Sprint 2. Only one opening balance per account (no history), no edit or
+delete of transactions, no filters, no pagination beyond a fixed page size, no reports.
+Authentication is the TokTickIT design both students already built, so the new work is the
+domain: the allocation rules (BR-01–BR-07), the balance engine and the summary (BR-08).
+
+**Sprint 1 Issues (in order):**
+
+| # | Issue | Branch | Features |
+|---|---|---|---|
+| 1 | Engineering baseline and Sprint 1 contracts | `feature/1-baseline-contracts` | all (docs) |
+| 2 | Project scaffold, data model, migration, seed | `feature/2-data-model` | F-03 data, F-08 data |
+| 3 | Authentication and access-control foundation | `feature/3-auth` | F-01, F-02 |
+| 4 | Accounts, balances and opening balance | `feature/4-accounts` | F-03, F-04 |
+| 5 | Record transaction, history and detail | `feature/5-transactions` | F-05, F-06 |
+| 6 | Financial summary and admin user management | `feature/6-summary-admin` | F-07, F-08 |
+| 7 | UI journey, E2E tests and release docs | `feature/7-ui-e2e` | all UI, E2E |
+
+Flow: each feature branch from `sprint-1-staging` → PR into `sprint-1-staging` reviewed by the
+teammate → integration tests on staging → release PR `sprint-1-staging` → `main` → tag
+`v0.1.0`.
+
+## Remaining work after Sprint 1
+
+Sprint 2: FR-13–FR-19, BR-16–BR-19, NFR-07–NFR-09 (with Lab 5). Sprint 3: FR-20–FR-22,
+NFR-10–NFR-12 verification, Q-01 resolution, defects from Labs 6–7.

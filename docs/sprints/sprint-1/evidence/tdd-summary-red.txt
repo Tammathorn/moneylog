@@ -1,0 +1,9 @@
+   × TEST-41 summary of the Sprint 1 journey (AC-35, BR-08) > computes balances, debt, income, expenses, net and category spending 7ms
+   × TEST-41 summary of the Sprint 1 journey (AC-35, BR-08) > never counts transfers, borrowing, lending, repayments or opening balances as income or expense 1ms
+   × TEST-43 (unit part) date range affects flows only (AC-36) > counts only lines dated inside the inclusive range, balances stay all-time 1ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+AssertionError: expected +0 to be 3400000 // Object.is equality
+AssertionError: expected +0 to be 200 // Object.is equality
+AssertionError: expected +0 to be 185000 // Object.is equality
+ Test Files  1 failed (1)
+      Tests  3 failed (3)

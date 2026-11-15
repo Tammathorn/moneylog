@@ -1,0 +1,10 @@
+ RUN  v2.1.9 /home/claude/moneylog/server
+ ✓ tests/api/auth.api.test.ts (7 tests) 648ms
+ ✓ tests/unit/http-error.test.ts (1 test) 5ms
+ ✓ tests/unit/session.test.ts (2 tests) 4ms
+ ✓ tests/unit/password.test.ts (1 test) 323ms
+   ✓ TEST-07 password hashing (AC-07, NFR-02) > stores scrypt hashes that differ per call and verify only the right password 321ms
+ Test Files  4 passed (4)
+      Tests  11 passed (11)
+   Start at  16:35:25
+   Duration  3.56s (transform 167ms, setup 0ms, collect 486ms, tests 980ms, environment 2ms, prepare 229ms)
