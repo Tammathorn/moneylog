@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 import { errorHandler, sendError } from "./lib/http-error.js";
 import { originCheck } from "./middleware/auth.js";
 import { authRouter } from "./routes/auth.js";
+import { accountsRouter } from "./routes/accounts.js";
 
 // Exported without listen() so Supertest can import it (index.ts starts the server).
 export const app = express();
@@ -24,6 +25,7 @@ app.get("/api/health", (_req, res) => {
   res.json({ status: "ok", service: "MoneyLog API" });
 });
 app.use("/api/auth", authRouter);
+app.use("/api/accounts", accountsRouter);
 
 app.use("/api", (_req, res) => sendError(res, 404, "NOT_FOUND", "That record was not found."));
 
