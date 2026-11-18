@@ -42,7 +42,7 @@ export default async function setup(): Promise<void> {
 
   const prisma = new PrismaClient({ datasources: { db: { url: testUrl } } });
   try {
-    await seed(prisma, TEST_PASSWORD);
+    await seed(prisma, { adminPassword: TEST_PASSWORD, demoPassword: TEST_PASSWORD });
   } finally {
     await prisma.$disconnect();
   }

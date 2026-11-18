@@ -4,6 +4,7 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { errorHandler, sendError } from "./lib/http-error.js";
 import { originCheck } from "./middleware/auth.js";
+import { getPrisma } from "./prisma.js";
 import { authRouter } from "./routes/auth.js";
 import { accountsRouter } from "./routes/accounts.js";
 import { transactionsRouter } from "./routes/transactions.js";
@@ -26,6 +27,19 @@ app.use((err: { type?: string }, req: express.Request, _res: express.Response, n
 
 app.get("/api/health", (_req, res) => {
   res.json({ status: "ok", service: "MoneyLog API" });
+});
+// Readiness: proves the API can reach PostgreSQL (smoke test, Lab 5).
+app.get("/api/ready", async (_req, res) => {
+  try {
+    await getPrisma().$queryRaw`SELECT 1`;
+    res.json({ status: "ok", db: "connected" });
+  } catch {
+    res.status(503).json({ status: "unavailable", db: "disconnected" });
+  }
+});
+// Which commit is running (R-08). Set at image build / deploy time.
+app.get("/api/version", (_req, res) => {
+  res.json({ service: "moneylog", commit: process.env.APP_COMMIT_SHA || "unknown" });
 });
 app.use("/api/auth", authRouter);
 app.use("/api/accounts", accountsRouter);
