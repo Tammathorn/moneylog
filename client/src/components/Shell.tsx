@@ -1,5 +1,6 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "../auth";
+import { Footer } from "./Footer";
 
 export function Shell() {
   const { user, signOut } = useAuth();
@@ -22,6 +23,7 @@ export function Shell() {
         </div>
       </header>
       <main className="content"><Outlet /></main>
+      <Footer />
     </div>
   );
 }
