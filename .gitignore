@@ -8,3 +8,6 @@ blob-report/
 e2e/.auth/
 coverage/
 docs/report/*.html
+__pycache__/
+*.pyc
+.localtest/
