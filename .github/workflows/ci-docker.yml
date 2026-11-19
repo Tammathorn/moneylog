@@ -48,7 +48,8 @@ jobs:
 
       - name: Deploy scripts - syntax and offline tests (no GCP access)
         run: |
-          bash -n deploy/deploy.sh deploy/release.sh deploy/teardown.sh
+          bash -n deploy/deploy.sh deploy/release.sh deploy/teardown.sh deploy/setup-github-oidc.sh
+          DRY_RUN=1 PROJECT_ID=ci-check bash deploy/setup-github-oidc.sh | grep -q "workload-identity-pools providers create-oidc github-main"
           bash deploy/tests/test_deploy_stub.sh
           bash deploy/tests/test_release_stub.sh
           python3 -m unittest discover -s deploy/tests -p 'test_smoke.py' -v

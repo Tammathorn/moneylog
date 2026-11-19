@@ -10,7 +10,7 @@ Starting point: Sprint 1 release `v0.1.0` (`main` commit `088148a`).
 | App | Node 24, Express 4 API + React 18/Vite SPA in **one image** on port 3000 (`SERVE_CLIENT=true`) | Same |
 | ORM / DB | Prisma 5, PostgreSQL 16 → **Cloud SQL for PostgreSQL 16** | Same |
 | Runtime | **Cloud Run** service `moneylog`, migration job `moneylog-migrate` | Same pattern |
-| Images | **Artifact Registry** `asia-southeast1-docker.pkg.dev/<PROJECT_ID>/moneylog/moneylog:<commit SHA>` | Same |
+| Images | **Artifact Registry** `asia-southeast1-docker.pkg.dev/moneylog-cpe334/moneylog/moneylog:<commit SHA>` | Same |
 | Secrets | **Secret Manager** (`moneylog-database-url`, `moneylog-admin-password`, `moneylog-demo-password`) | Same |
 | CI/CD | **GitHub Actions** (`ci-docker.yml`, `deploy.yml`) + Workload Identity Federation | Same |
 
@@ -57,7 +57,7 @@ Pipeline values are GitHub **variables** (not secrets) in environment `demo`: `G
 
 | Item | Name |
 |---|---|
-| Project | `<PROJECT_ID>` |
+| Project | `moneylog-cpe334` (number 73939023981), Free Trial billing account, owner tammathorn.contact@gmail.com, Chakriwat (chakriwat13@gmail.com) Editor |
 | Region | `asia-southeast1` |
 | Artifact Registry | `moneylog` (Docker) |
 | Cloud SQL | instance `moneylog-pg` (PostgreSQL 16, enterprise, `db-f1-micro`, 10 GB, auto-increase off), database `moneylog`, user `moneylog` |
@@ -65,8 +65,37 @@ Pipeline values are GitHub **variables** (not secrets) in environment `demo`: `G
 | Cloud Run job | `moneylog-migrate` (`prisma migrate deploy && npm run db:seed:prod`) |
 | Runtime service account | `moneylog-runner` (`roles/cloudsql.client`, secret accessor on the 3 secrets) |
 | Deployer service account | `moneylog-deployer` (WIF from `Tammathorn/moneylog`, `main` only) |
-| Public URL | `<SERVICE_URL>` |
+| Public URL | https://moneylog-73939023981.asia-southeast1.run.app |
+| Budget | `moneylog-lab5`, ฿700/month, alerts at 50/90/100 % (alerts only) |
+| WIF | pool `github-actions`, provider `github-main` (condition: repository_id 1458228292, owner 152457560, `refs/heads/main`, environment `demo`, workflow `deploy.yml`) |
 
-## 5. Release procedure
+## 5. Release procedure (every release is a merge into `main`)
 
-To be completed in Issue #22 (Lab 5 #7).
+1. **Issue → branch.** Open an Issue (label `lab5` for Lab 5 work), branch `feature/<issue>-<slug>` from `staging`.
+2. **PR into `staging`.** CI (`CI & Docker Build` / job **`test-and-docker`**) runs the deploy-script tests, the server tests on PostgreSQL, the client tests and build, the Playwright E2E tests and `docker build`. The teammate (not the author) reviews with a specific check, then merges with a merge commit.
+3. **Release PR `staging` → `main`.** CI runs again. The ruleset `protect-main` requires a PR, 1 approval, a passing `test-and-docker` and an up-to-date branch, with no bypass. A failing check cannot be merged (C-02).
+4. **Automatic deploy.** Merging into `main` starts `.github/workflows/deploy.yml` in environment `demo` (main only):
+   CI again → sign in to GCP with Workload Identity Federation (no key) → `docker build --build-arg GIT_SHA=<sha>` → push `…/moneylog/moneylog:<full sha>` → `deploy/release.sh` (resolve the **digest**, update and run the migration job `moneylog-migrate`, point the Cloud Run service at the digest, 100 % traffic) → `deploy/smoke_test.py <URL> <sha>`, which fails the run unless `/api/version` reports that exact commit.
+5. **Which commit is running?** Any of these:
+   - `curl https://moneylog-73939023981.asia-southeast1.run.app/api/version` → `{"commit":"<sha>"}`
+   - the footer of every page: "release `<short sha>`"
+   - the run summary of **Deploy demo** (commit, image digest, URL)
+   - `gcloud run services describe moneylog --region asia-southeast1 --format='value(spec.template.spec.containers[0].image)'` → digest, which maps to the image tagged with the SHA in Artifact Registry
+6. **Rollback.** Actions → Deploy demo → Run workflow on `main`, with `image_tag` = the full 40-character SHA of an earlier release. Tests, build and migration are skipped, and that image is redeployed by digest and smoke-tested. Roll forward the same way with the newer SHA. Migrations are additive (expand, then contract), so the older image still works with the schema.
+
+## 6. First deploy and one-time setup (already done)
+
+| Step | Command (Cloud Shell, project `moneylog-cpe334`) | Result |
+|---|---|---|
+| Budget + teammate | `gcloud billing budgets create … --budget-amount=700THB` · `gcloud projects add-iam-policy-binding … --member=user:chakriwat13@gmail.com --role=roles/editor` | Budget `moneylog-lab5`; Chakriwat Editor |
+| Plan | `DRY_RUN=1 PROJECT_ID=moneylog-cpe334 bash deploy/deploy.sh --demo` | Printed the plan; nothing created |
+| First deploy | `PROJECT_ID=moneylog-cpe334 bash deploy/deploy.sh --demo` | Cloud SQL `moneylog-pg`, secrets, job, service revision `moneylog-00001`; commit `437026b` |
+| GitHub trust | `PROJECT_ID=moneylog-cpe334 bash deploy/setup-github-oidc.sh` | Deployer SA + WIF pool/provider; 4 variables in environment `demo` |
+
+Demo passwords are only in Secret Manager (`moneylog-admin-password`, `moneylog-demo-password`). Read them in the Console (Secret Manager → version → View) and share them privately with the Lab 6 partner team. Never paste them into Git, chat or screenshots.
+
+## 7. Cost control
+
+Cloud Run min 0 / max 2 instances. Cloud SQL is the smallest tier (`db-f1-micro`, 10 GB, auto-increase off). To pause when idle:
+`gcloud sql instances patch moneylog-pg --activation-policy=NEVER` (resume with `ALWAYS`; keep it running during grading).
+After the course: `bash deploy/teardown.sh`.
