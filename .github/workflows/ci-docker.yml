@@ -1,0 +1,87 @@
+# CI & Docker Build - required check `test-and-docker` (Lab 5 #4, R-05/R-06).
+# Runs on every PR into staging or main, manually, and is reused by deploy.yml.
+# It never deploys and holds no secrets (the database below is a throw-away CI one).
+name: CI & Docker Build
+
+on:
+  workflow_call:
+  pull_request:
+    branches: [staging, main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Do not rename: the ruleset on main requires this check by name.
+  test-and-docker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: moneylog
+          POSTGRES_PASSWORD: ci-only-password
+          POSTGRES_DB: moneylog
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      DATABASE_URL: postgresql://moneylog:ci-only-password@localhost:5432/moneylog?schema=public
+      E2E_DATABASE_URL: postgresql://moneylog:ci-only-password@localhost:5432/moneylog_e2e?schema=public
+      CLIENT_ORIGIN: http://localhost:5173
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "24"
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.14"
+
+      - name: Deploy scripts - syntax and offline tests (no GCP access)
+        run: |
+          bash -n deploy/deploy.sh deploy/release.sh deploy/teardown.sh
+          bash deploy/tests/test_deploy_stub.sh
+          bash deploy/tests/test_release_stub.sh
+          python3 -m unittest discover -s deploy/tests -p 'test_smoke.py' -v
+
+      - name: Server - install, migrate, build, unit + API/DB tests
+        working-directory: server
+        run: |
+          npm ci
+          npx prisma migrate deploy
+          npm run build
+          npm test
+
+      - name: Client - install, component tests, production build
+        working-directory: client
+        run: |
+          npm ci
+          npm test
+          npm run build
+
+      - name: End-to-end - Playwright against real UI, API and PostgreSQL
+        run: |
+          psql "postgresql://moneylog:ci-only-password@localhost:5432/moneylog" -c "CREATE DATABASE moneylog_e2e;"
+          npm ci
+          npx playwright install --with-deps chromium
+          npx playwright test
+
+      - name: Docker - production image builds
+        run: docker build --build-arg GIT_SHA=${{ github.sha }} -t moneylog:ci .
+
+      - name: Upload Playwright report on failure
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: playwright-traces
+          path: test-results/
+          retention-days: 7
