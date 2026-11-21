@@ -1,0 +1,103 @@
+# Deploy demo - every merge into main is a release (Lab 5 #7, R-07/R-08).
+#   push to main  : CI (test-and-docker) -> build image tagged with the commit SHA
+#                   -> migration job -> Cloud Run by digest -> smoke test
+#   manual run    : image_tag = full SHA of an existing image => rollback
+#                   (tests, build and migration are skipped).
+# No secrets in this file: GitHub environment `demo` (main only) holds the
+# variables; login to GCP is keyless (Workload Identity Federation).
+name: Deploy demo
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: "Rollback: full 40-character commit SHA of an existing image. Empty = test, build and deploy main."
+        type: string
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-demo
+  cancel-in-progress: false
+
+jobs:
+  test:
+    if: github.ref == 'refs/heads/main' && !inputs.image_tag
+    uses: ./.github/workflows/ci-docker.yml
+
+  deploy:
+    needs: test
+    if: >-
+      always() && !cancelled() && github.ref == 'refs/heads/main' &&
+      (needs.test.result == 'success' ||
+       (github.event_name == 'workflow_dispatch' && inputs.image_tag != '' && needs.test.result == 'skipped'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: demo
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+      REGION: ${{ vars.GCP_REGION }}
+      SERVICE_NAME: moneylog
+      MIGRATE_JOB_NAME: moneylog-migrate
+      IMAGE_TAG: ${{ inputs.image_tag || github.sha }}
+      ROLLBACK: ${{ inputs.image_tag != '' }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Validate deployment settings
+        env:
+          WIF_PROVIDER: ${{ vars.WIF_PROVIDER }}
+          WIF_SERVICE_ACCOUNT: ${{ vars.WIF_SERVICE_ACCOUNT }}
+        run: |
+          test -n "$PROJECT_ID" && test -n "$REGION" && test -n "$WIF_PROVIDER" && test -n "$WIF_SERVICE_ACCOUNT"
+          [[ "$IMAGE_TAG" =~ ^[0-9a-f]{40}$ ]] || { echo "Image tag must be a full 40-character commit SHA."; exit 1; }
+
+      - name: Authenticate to Google Cloud (Workload Identity Federation, no key)
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3
+        with:
+          workload_identity_provider: ${{ vars.WIF_PROVIDER }}
+          service_account: ${{ vars.WIF_SERVICE_ACCOUNT }}
+      - uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3.0.1
+
+      - name: Build and push image tagged with the commit SHA
+        if: env.ROLLBACK != 'true'
+        run: |
+          gcloud auth configure-docker "$REGION-docker.pkg.dev" --quiet
+          IMAGE="$REGION-docker.pkg.dev/$PROJECT_ID/moneylog/moneylog:$IMAGE_TAG"
+          docker build --build-arg GIT_SHA="$IMAGE_TAG" --tag "$IMAGE" .
+          docker push "$IMAGE"
+
+      - name: Verify image, migrate, deploy by digest
+        run: bash deploy/release.sh
+
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.14"
+
+      - name: Smoke test the public URL (expects this commit to be running)
+        env:
+          SMOKE_EMAIL: ${{ vars.SMOKE_EMAIL }}
+          SMOKE_PASSWORD: ${{ secrets.SMOKE_PASSWORD }}
+        run: python3 deploy/smoke_test.py "$SERVICE_URL" "$IMAGE_TAG"
+
+      - name: Record deployment
+        run: |
+          {
+            echo "### MoneyLog demo deployment"
+            echo "- Commit (image tag): \`$IMAGE_TAG\`"
+            echo "- Image digest: \`$DEPLOYED_IMAGE\`"
+            echo "- Rollback: $ROLLBACK"
+            echo "- URL: $SERVICE_URL"
+            echo "- Running commit check: $SERVICE_URL/api/version"
+            echo "- Smoke test: passed"
+          } >> "$GITHUB_STEP_SUMMARY"

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../auth";
 import { ApiError, GENERIC } from "../api";
 import { ErrorAlert } from "../components/Money";
+import { Footer } from "../components/Footer";
 
 export function Login() {
   const { signIn, notice } = useAuth();
@@ -43,6 +44,7 @@ export function Login() {
         {fields.password && <p className="field-error">{fields.password}</p>}
         <button type="submit" className="primary" disabled={busy}>{busy ? "Signing in…" : "Sign in"}</button>
       </form>
+      <Footer />
     </main>
   );
 }

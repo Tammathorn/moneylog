@@ -30,7 +30,7 @@ docker run --name moneylog-db -e POSTGRES_USER=moneylog -e POSTGRES_PASSWORD=mon
 ```
 
 ```bash
-cp server/.env.example server/.env        # then set SEED_DEMO_PASSWORD to your own local value
+cp server/.env.example server/.env        # then replace every CHANGE_ME with your own local value
 npm install --prefix server
 npm install --prefix client
 npm install                               # Playwright (root)
@@ -48,7 +48,10 @@ npm run dev --prefix client               # UI on http://localhost:5173
 | `CLIENT_ORIGIN` | `http://localhost:5173` | Allowed `Origin` for writes (CSRF check) |
 | `COOKIE_SECURE` | `false` | `true` behind HTTPS (Cloud Run) |
 | `SERVE_CLIENT` | `false` | `true` in the Docker image: Express serves `client/dist` |
-| `SEED_DEMO_PASSWORD` | *(your choice, 8+ chars)* | Password given to every seeded demo account |
+| `APP_COMMIT_SHA` | `local` | Commit shown by `/api/version` (set by the image build) |
+| `ADMIN_PASSWORD` | *(your choice, 12+ chars)* | Seed only: password of `admin@moneylog.test` |
+| `SEED_DEMO_DATA` | `true` | Seed only: also create the demo users |
+| `DEMO_USER_PASSWORD` | *(your choice, 12+ chars)* | Seed only: password of the demo users |
 
 ### Demo accounts (created by the seed, synthetic data)
 
@@ -59,7 +62,7 @@ npm run dev --prefix client               # UI on http://localhost:5173
 | `bob@moneylog.test` | USER | 10 seeded accounts, no transactions |
 | `dave@moneylog.test` | USER | Disabled: cannot sign in |
 
-All use the `SEED_DEMO_PASSWORD` you set. No real password is stored in Git.
+The admin uses `ADMIN_PASSWORD`, and the demo users use `DEMO_USER_PASSWORD`. No real password is stored in Git. Deployment to GCP: `docs/labs/lab-05/deployment.md`.
 
 ## Tests
 

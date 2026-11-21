@@ -1,0 +1,15 @@
+**/node_modules
+**/dist
+**/.env
+**/.env.*
+!**/.env.example
+*.log
+.git
+.github
+test-results
+playwright-report
+blob-report
+e2e
+docs
+artifacts
+gha-creds-*.json

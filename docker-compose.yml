@@ -1,0 +1,46 @@
+# Local run of the production image with PostgreSQL (Lab 5 #3, C-03).
+#   cp .env.example .env   # set the passwords
+#   docker compose up --build      -> http://localhost:3000
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:?set in .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set in .env}
+      POSTGRES_DB: ${POSTGRES_DB:-moneylog}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB:-moneylog}"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  # Same image as the app; runs migrations + seed once, like the Cloud Run job.
+  migrate:
+    build: .
+    image: moneylog:local
+    depends_on:
+      db: { condition: service_healthy }
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-moneylog}?schema=public
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?set in .env}
+      SEED_DEMO_DATA: ${SEED_DEMO_DATA:-true}
+      DEMO_USER_PASSWORD: ${DEMO_USER_PASSWORD:-}
+    command: ["sh", "-c", "npx prisma migrate deploy && npm run db:seed:prod"]
+    restart: "no"
+
+  app:
+    image: moneylog:local
+    depends_on:
+      db: { condition: service_healthy }
+      migrate: { condition: service_completed_successfully }
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-moneylog}?schema=public
+      CLIENT_ORIGIN: http://localhost:3000
+      COOKIE_SECURE: "false"
+    ports:
+      - "3000:3000"
+
+volumes:
+  pgdata:

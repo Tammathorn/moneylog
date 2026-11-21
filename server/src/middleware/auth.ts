@@ -10,10 +10,19 @@ import { SESSION_COOKIE, findSession } from "../lib/session.js";
 export const clientOrigin = () => process.env.CLIENT_ORIGIN || "http://localhost:5173";
 const WRITES = new Set(["POST", "PUT", "PATCH", "DELETE"]);
 
-// CSRF cover beside SameSite=Strict (AC-12): a present foreign Origin on a write is refused.
+// The app's own origin. Behind Cloud Run the Host header is the public host name.
+function ownOrigin(req: Request): string | null {
+  const host = (req.headers["x-forwarded-host"] as string | undefined) ?? req.headers.host;
+  if (!host) return null;
+  const proto = ((req.headers["x-forwarded-proto"] as string | undefined) ?? req.protocol).split(",")[0].trim();
+  return `${proto}://${host}`;
+}
+
+// CSRF cover beside SameSite=Strict (AC-12): a write whose Origin is neither the
+// app's own origin nor CLIENT_ORIGIN (local Vite dev server) is refused.
 export const originCheck: RequestHandler = (req, res, next) => {
   const origin = req.headers.origin;
-  if (WRITES.has(req.method) && origin !== undefined && origin !== clientOrigin()) {
+  if (WRITES.has(req.method) && origin !== undefined && origin !== clientOrigin() && origin !== ownOrigin(req)) {
     sendError(res, 403, "ORIGIN_NOT_ALLOWED", "This request did not come from the MoneyLog app.");
     return;
   }
