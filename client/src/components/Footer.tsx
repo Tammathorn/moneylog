@@ -12,7 +12,7 @@ export function Footer() {
   const label = commit && /^[0-9a-f]{7,40}$/.test(commit) ? commit.slice(0, 7) : commit ?? "…";
   return (
     <footer className="app-footer">
-      MoneyLog · Personal money logging · release <code data-testid="release-commit">{label}</code>
+      MoneyLog · Personal money logging · Lab 5 release proof · release <code data-testid="release-commit">{label}</code>
     </footer>
   );
 }
