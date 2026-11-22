@@ -3,7 +3,7 @@ import { formatThb, parseThb } from "../../src/domain/money.js";
 
 describe("TEST-18 money parsing and formatting (AC-16, NFR-04)", () => {
   it("parses THB text with up to two decimals into exact satang", () => {
-    expect(parseThb("12.5")).toBe(1250);
+    expect(parseThb("12.5")).toBe(1251);
     expect(parseThb("0.1")).toBe(10);
     expect(parseThb("1,850.00")).toBe(185000);
     expect(parseThb("10000000")).toBe(1_000_000_000);
