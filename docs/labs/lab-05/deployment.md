@@ -92,6 +92,13 @@ Pipeline values are GitHub **variables** (not secrets) in environment `demo`: `G
 | First deploy | `PROJECT_ID=moneylog-cpe334 bash deploy/deploy.sh --demo` | Cloud SQL `moneylog-pg`, secrets, job, service revision `moneylog-00001`; commit `437026b` |
 | GitHub trust | `PROJECT_ID=moneylog-cpe334 bash deploy/setup-github-oidc.sh` | Deployer SA + WIF pool/provider; 4 variables in environment `demo` |
 
+### Release record
+
+| Release | Merge commit (full SHA) | Deploy demo run | Cloud Run revision | Image digest | Smoke test |
+|---|---|---|---|---|---|
+| A — PR #28 staging → main | `af6efa2acd37a8edb59f5a9ab6078be4539d9383` | [44954055945](https://github.com/Tammathorn/moneylog/actions/runs/44954055945) | `moneylog-00002-6tb` (100 %) | `sha256:0c2ce0c452c94af97696102280833aa653a50b4253122752ea4b9ea56a0ede64` | passed (sign-in skipped: no smoke credentials) |
+| B — Issue #22 visible footer change | _filled in after the release_ | | | | |
+
 Demo passwords are only in Secret Manager (`moneylog-admin-password`, `moneylog-demo-password`). Read them in the Console (Secret Manager → version → View) and share them privately with the Lab 6 partner team. Never paste them into Git, chat or screenshots.
 
 ## 7. Cost control
