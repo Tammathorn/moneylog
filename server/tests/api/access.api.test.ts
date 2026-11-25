@@ -11,10 +11,14 @@ beforeAll(async () => {
   admin = await makeSignedInUser("ADMIN");
 });
 
-type Method = "get" | "post" | "put" | "patch";
+type Method = "get" | "post" | "put" | "patch" | "delete";
 const FINANCIAL: [Method, string][] = [
   ["get", "/api/accounts"], ["put", "/api/accounts/1/opening-balance"], ["post", "/api/transactions"],
   ["get", "/api/transactions"], ["get", "/api/transactions/1"], ["get", "/api/summary"],
+];
+// Sprint 2 routes (TEST-92): each feature PR adds its new protected routes here.
+const SPRINT2: [Method, string][] = [
+  ["post", "/api/accounts"], ["patch", "/api/accounts/1"], ["delete", "/api/accounts/1"],
 ];
 const ADMIN: [Method, string][] = [["get", "/api/admin/users"], ["patch", "/api/admin/users/1"]];
 const SESSION: [Method, string][] = [["get", "/api/auth/me"], ["post", "/api/auth/logout"]];
@@ -60,4 +64,17 @@ describe("TEST-14 cross-site writes are refused (AC-12)", () => {
     expect(res.body.error.code).toBe("ORIGIN_NOT_ALLOWED");
     expect(await counts()).toEqual(before);
   });
+});
+
+describe("TEST-92 Sprint 2 routes refuse anonymous callers and administrators (AC-09, AC-10 extended)", () => {
+  for (const [method, path] of SPRINT2) {
+    it(`${method.toUpperCase()} ${path} -> 401 anonymous, 403 admin`, async () => {
+      const anon = await request(app)[method](path).send({});
+      expect(anon.status).toBe(401);
+      expect(Object.keys(anon.body)).toEqual(["error"]);
+      const res = await admin.agent[method](path).send({});
+      expect(res.status).toBe(403);
+      expect(res.body).toEqual({ error: { code: "FORBIDDEN_ROLE", message: "You do not have access to this." } });
+    });
+  }
 });

@@ -68,3 +68,4 @@ button.link { border: none; background: none; color: var(--primary); padding: 4p
 .app-footer { text-align: center; color: var(--muted); font-size: .85rem; padding: 16px; }
 .app-footer code { background: #e8edf2; padding: 1px 6px; border-radius: 4px; }
 .login { grid-template-rows: 1fr auto; }
+button.link.danger { color: var(--danger); }
