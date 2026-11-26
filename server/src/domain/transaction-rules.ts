@@ -66,7 +66,10 @@ export function usableAccounts(own: OwnAccount[], keep: ReadonlySet<number> = ne
   return new Map(own.filter((a) => a.isActive || keep.has(a.id)).map((a) => [a.id, { id: a.id, type: a.type }]));
 }
 
-// F-10 (AC-53): stub committed with the tests (TDD red); implemented next.
-export function editableAccounts(_own: OwnAccount[], _saved: { accountId: number; lines: { accountId: number }[] }) {
-  return { usable: new Map<number, RuleAccount>(), keep: new Set<number>() as ReadonlySet<number> };
+// F-10 (AC-53): an edit may use the active accounts plus archived accounts already on the saved transaction,
+// so an old record can still be corrected after its account was archived.
+export function editableAccounts(own: OwnAccount[], saved: { accountId: number; lines: { accountId: number }[] }) {
+  const onSaved = new Set([saved.accountId, ...saved.lines.map((l) => l.accountId)]);
+  const keep: ReadonlySet<number> = new Set(own.filter((a) => !a.isActive && onSaved.has(a.id)).map((a) => a.id));
+  return { usable: usableAccounts(own, keep), keep };
 }

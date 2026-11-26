@@ -2,6 +2,7 @@ import { expect, type Page } from "@playwright/test";
 
 export const PASSWORD = process.env.E2E_SEED_PASSWORD ?? "E2e-Pass-2026";
 export const SHOTS = "docs/sprints/sprint-1/evidence/screenshots";
+export const SHOTS2 = "docs/sprints/sprint-2/evidence/screenshots";
 export const today = () => new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Bangkok" }).format(new Date());
 
 export async function signIn(page: Page, email: string) {
@@ -12,6 +13,6 @@ export async function signIn(page: Page, email: string) {
   await expect(page.getByTestId("current-user")).toBeVisible();
 }
 
-export async function shot(page: Page, name: string) {
-  await page.screenshot({ path: `${SHOTS}/${name}.png`, fullPage: true });
+export async function shot(page: Page, name: string, dir = SHOTS) {
+  await page.screenshot({ path: `${dir}/${name}.png`, fullPage: true });
 }
