@@ -1,26 +1,64 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { api, ApiError, GENERIC, type Transaction } from "../api";
+import { api, ApiError, GENERIC, type Account, type Transaction } from "../api";
+import { parseThb } from "../money";
 import { ErrorAlert, Money, Status } from "../components/Money";
 
 const KIND = { PAYMENT: "Payment", RECEIPT: "Received" } as const;
 
+const PAGE = 50;
+const FILTER_KEYS = ["from", "to", "accountId", "kind", "q", "min", "max", "favourite"] as const;
+type Form = Record<(typeof FILTER_KEYS)[number], string>;
+const thbText = (satang: string | null) => (satang ? (Number(satang) / 100).toFixed(2) : "");
+
+// F-06 history + F-11 filters (in the URL so Back/refresh keep them) + F-12 favourites.
 export function History() {
   const [params, setParams] = useSearchParams();
   const [data, setData] = useState<{ items: Transaction[]; total: number } | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [favouriteOnly, setFavouriteOnly] = useState(params.get("favourite") === "true");
+  const [accounts, setAccounts] = useState<Account[]>([]);
+  const fromUrl = (): Form => ({
+    from: params.get("from") ?? "", to: params.get("to") ?? "", accountId: params.get("accountId") ?? "", kind: params.get("kind") ?? "",
+    q: params.get("q") ?? "", min: thbText(params.get("minSatang")), max: thbText(params.get("maxSatang")), favourite: params.get("favourite") ?? "",
+  });
+  const [form, setForm] = useState<Form>(fromUrl);
   const query = params.toString();
+  const offset = Number(params.get("offset") ?? 0) || 0;
+  const filtered = [...params.keys()].some((k) => k !== "offset");
 
   useEffect(() => {
+    api<{ accounts: Account[] }>("/accounts").then((r) => setAccounts(r.accounts), () => setAccounts([]));
+  }, []);
+  useEffect(() => {
     setData(null);
-    api<{ items: Transaction[]; total: number }>(`/transactions${query ? `?${query}` : ""}`).then(setData, (e) => setError(e instanceof ApiError ? e.message : GENERIC));
+    setError(null);
+    api<{ items: Transaction[]; total: number }>(`/transactions${query ? `?${query}` : ""}`).then(setData, (e) => setError(e instanceof ApiError ? Object.values(e.fields)[0] ?? e.message : GENERIC));
   }, [query]);
+
+  const minS = form.min ? parseThb(form.min) : null;
+  const maxS = form.max ? parseThb(form.max) : null;
+  const amountError = (form.min && minS === null) || (form.max && maxS === null) ? "Enter amounts like 100 or 99.50."
+    : minS !== null && maxS !== null && minS > maxS ? "Min must not be above Max." : null;
+  const set = (k: keyof Form, v: string) => setForm((f) => ({ ...f, [k]: v }));
 
   function apply(e: FormEvent) {
     e.preventDefault();
+    if (amountError) return;
     const next = new URLSearchParams();
-    if (favouriteOnly) next.set("favourite", "true");
+    for (const k of ["from", "to", "accountId", "kind", "q"] as const) if (form[k].trim()) next.set(k, form[k].trim());
+    if (minS !== null) next.set("minSatang", String(minS));
+    if (maxS !== null) next.set("maxSatang", String(maxS));
+    if (form.favourite === "true") next.set("favourite", "true");
+    setParams(next);
+  }
+  function clear() {
+    setForm({ from: "", to: "", accountId: "", kind: "", q: "", min: "", max: "", favourite: "" });
+    setParams(new URLSearchParams());
+  }
+  function goTo(newOffset: number) {
+    const next = new URLSearchParams(params);
+    if (newOffset > 0) next.set("offset", String(newOffset));
+    else next.delete("offset");
     setParams(next);
   }
 
@@ -29,13 +67,35 @@ export function History() {
   return (
     <section>
       <div className="page-head"><h1>History</h1><Link className="button primary" to="/transactions/new">New transaction</Link></div>
-      <form className="card inline-form filters" onSubmit={apply} aria-label="Filter transactions">
-        <label className="check"><input type="checkbox" checked={favouriteOnly} onChange={(e) => setFavouriteOnly(e.target.checked)} /> Favourites only</label>
-        <button type="submit" className="primary">Apply</button>
+      <form className="card filters" onSubmit={apply} aria-label="Filter transactions">
+        <div className="filter-grid">
+          <label>From <input type="date" value={form.from} onChange={(e) => set("from", e.target.value)} aria-label="From" /></label>
+          <label>To <input type="date" value={form.to} onChange={(e) => set("to", e.target.value)} aria-label="To" /></label>
+          <label>Account
+            <select value={form.accountId} onChange={(e) => set("accountId", e.target.value)} aria-label="Account">
+              <option value="">Any account</option>
+              {accounts.map((a) => <option key={a.id} value={a.id}>{a.name}{a.isActive ? "" : " (archived)"}</option>)}
+            </select>
+          </label>
+          <label>Kind
+            <select value={form.kind} onChange={(e) => set("kind", e.target.value)} aria-label="Kind">
+              <option value="">Any</option><option value="PAYMENT">Payment</option><option value="RECEIPT">Money received</option>
+            </select>
+          </label>
+          <label>Text <input value={form.q} maxLength={100} onChange={(e) => set("q", e.target.value)} aria-label="Text" placeholder="Description or note" /></label>
+          <label>Min ฿ <input inputMode="decimal" value={form.min} onChange={(e) => set("min", e.target.value)} aria-label="Min ฿" /></label>
+          <label>Max ฿ <input inputMode="decimal" value={form.max} onChange={(e) => set("max", e.target.value)} aria-label="Max ฿" /></label>
+          <label className="check"><input type="checkbox" checked={form.favourite === "true"} onChange={(e) => set("favourite", e.target.checked ? "true" : "")} /> Favourites only</label>
+        </div>
+        {amountError && <p className="field-error">{amountError}</p>}
+        <div className="row">
+          <button type="submit" className="primary" disabled={!!amountError}>Apply</button>
+          <button type="button" onClick={clear}>Clear</button>
+        </div>
       </form>
       <ErrorAlert message={error} />
       {!data && !error && <Status>Loading…</Status>}
-      {data?.items.length === 0 && (query
+      {data?.items.length === 0 && (filtered
         ? <p className="empty">No transactions match these filters.</p>
         : <p className="empty">No transactions yet — record your first one.</p>)}
       {data && data.items.length > 0 && (
@@ -55,7 +115,11 @@ export function History() {
               ))}
             </tbody>
           </table>
-          <p className="muted small">{data.total} transaction{data.total === 1 ? "" : "s"}</p>
+          <div className="pager">
+            <span className="muted small">Showing {offset + 1}–{offset + data.items.length} of {data.total}</span>
+            <button type="button" disabled={offset === 0} onClick={() => goTo(Math.max(offset - PAGE, 0))}>Previous</button>
+            <button type="button" disabled={offset + data.items.length >= data.total} onClick={() => goTo(offset + PAGE)}>Next</button>
+          </div>
         </div>
       )}
     </section>
