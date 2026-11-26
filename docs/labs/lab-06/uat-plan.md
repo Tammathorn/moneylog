@@ -1,7 +1,6 @@
 # MoneyLog — Sprint 1 UAT Plan and Handoff (Lab 6, Part A)
 
-Version 1.1 (2026-11-26). Product Team: Tammathorn Kananurak (67070503489) and Chakriwat Srivilai (67070503407).
-UAT Team (partner): **Pakato** — member names and IDs to be recorded in the Lab 6 report.
+Version 1.0 (2026-11-25). Product Team: Tammathorn Kananurak (67070503489) and Chakriwat Srivilai (67070503407).
 Theme 7: Personal Money and Expense Logging System. Repository: https://github.com/Tammathorn/moneylog
 
 ## 1. What is being tested
