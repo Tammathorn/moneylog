@@ -1,0 +1,32 @@
+# F-10/F-12 red: commit 0a8fd12 (tests + stubs)
+$ cd server && npx vitest run tests/unit/transaction-rules.test.ts tests/api/transaction-correction.api.test.ts tests/api/favourites.api.test.ts
+   × PUT /api/transactions/:id > TEST-69 replaces the header and lines and balances follow (AC-51) 95ms
+     → expected 404 to be 200 // Object.is equality
+   × PUT /api/transactions/:id > TEST-70 an invalid edit gets the same error as a new transaction and changes nothing (AC-52) 24ms
+     → {"totalSatang":185001}: expected 404 to be 422 // Object.is equality
+   × PUT /api/transactions/:id > TEST-71 keeps archived accounts already on the transaction, refuses other archived ones (AC-53) 52ms
+     → expected 404 to be 200 // Object.is equality
+   × DELETE /api/transactions/:id > TEST-72 removes the transaction and its lines; balances and summary go back (AC-54) 32ms
+     → expected 404 to be 204 // Object.is equality
+   × Atomic edit > TEST-74 a failure while writing the new lines keeps the old header and lines (AC-56, NFR-05) 4ms
+     → Cannot read properties of undefined (reading 'id')
+   × TEST-68 accounts an edit may use (AC-53, F-10 §3 step 3) > allows active accounts plus archived accounts already on the transaction 8ms
+     → expected [] to deeply equal [ 1, 3, 6, 7 ]
+   × TEST-68 accounts an edit may use (AC-53, F-10 §3 step 3) > still refuses a different archived account 2ms
+     → expected { code: 'ACCOUNT_ARCHIVED', …(1) } to deeply equal { code: 'ACCOUNT_ARCHIVED', …(1) }
+   × PUT /api/transactions/:id/favourite > TEST-75 marks and unmarks; rejects a non-boolean; another user's id is not found (AC-63) 51ms
+     → expected 404 to be 200 // Object.is equality
+   × GET /api/transactions?favourite=true > TEST-76 returns only the caller's favourites (AC-64) 64ms
+     → expected [ 261, 260, 259, 258 ] to not include 260
+ Test Files  3 failed (3)
+      Tests  9 failed | 13 passed (22)
+
+$ cd client && npx vitest run tests/TransactionDetail.test.tsx
+   × TEST-77 edit and delete from the detail page (AC-57) > Edit opens the form pre-filled and Save changes sends a PUT 1029ms
+   × TEST-77 edit and delete from the detail page (AC-57) > Delete asks for confirmation, then deletes and returns to History 1005ms
+   × TEST-79 favourite star (AC-67) > toggles the flag on the detail page 1006ms
+   × TEST-79 favourite star (AC-67) > filters History to favourites only 1006ms
+   × TEST-78 Duplicate (AC-65, AC-66, BR-18) > opens New transaction pre-filled with today's date and saves nothing until Save 1030ms
+   × TEST-78 Duplicate (AC-65, AC-66, BR-18) > leaves an archived line account empty with a message 1005ms
+ Test Files  1 failed (1)
+      Tests  6 failed (6)
