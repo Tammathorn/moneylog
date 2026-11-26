@@ -23,7 +23,7 @@ and passed on the stated version; "Planned" means not yet run. Test files are un
 | FR-11 | F-08 User list | 1 | AC-38 | TEST-45 | admin.api.test.ts | Pass — `v0.1.0` (D1) and regression at `ffeead5` |
 | FR-12 | F-08 Enable/disable | 1 | AC-39, AC-42 | TEST-46, TEST-49 | admin.api.test.ts, AdminUsers.test.tsx | Pass — `v0.1.0` (D1) and regression at `ffeead5` |
 | FR-13 | F-09 Create account | 2 | AC-43 – AC-45 | TEST-60 – TEST-63 | account-rules.test.ts, account-management.api.test.ts | Pass — `ffeead5` (local) + CI on PR |
-| FR-14 | F-09 Rename/archive | 2 | AC-46, AC-47, AC-50 | TEST-63, TEST-64, TEST-67 | account-management.api.test.ts, Accounts.test.tsx, NewTransaction.test.tsx | Pass — `ffeead5` (local) + CI on PR |
+| FR-14 | F-09 Rename/archive | 2 | AC-46, AC-47, AC-50 | TEST-63, TEST-64, TEST-67, TEST-99 | account-management.api.test.ts, Accounts.test.tsx, NewTransaction.test.tsx | Pass — `ffeead5` (local) + CI on PR |
 | FR-15 | F-10 Correction | 2 | AC-51 – AC-57 | TEST-68 – TEST-74, TEST-77, TEST-80 | transaction-correction.api.test.ts, TransactionDetail.test.tsx, e2e/sprint2-correction.spec.ts | Pass — `ffeead5` (local) + CI on PR |
 | FR-16 | F-11 Search and filter | 2 | AC-58 – AC-62 | TEST-81 – TEST-86 | history-filter.test.ts, history-filter.api.test.ts, History.test.tsx | Pass — `ffeead5` (local) + CI on PR |
 | FR-17 | F-12 Favourites | 2 | AC-63, AC-64, AC-67 | TEST-75, TEST-76, TEST-79 | favourites.api.test.ts, TransactionDetail.test.tsx | Pass — `ffeead5` (local) + CI on PR |
@@ -31,7 +31,7 @@ and passed on the stated version; "Planned" means not yet run. Test files are un
 | FR-19 | F-13 Loan overview | 2 | AC-68 – AC-72 | TEST-87 – TEST-91 | loans.test.ts, loans.api.test.ts, Loans.test.tsx | Pass — `ffeead5` (local) + CI on PR |
 | FR-20 | F-15 Monthly reports | 3 | AC-82 – AC-85 | planned | — | Planned (D3) — not run |
 | FR-21 | F-16 Admin creates user | 3 | AC-81 | planned | — | Planned (D3) — not run |
-| FR-22 | F-16 Change own password | 3 | AC-76 – AC-80 | TEST-94 – TEST-98 | password-policy.test.ts, password.api.test.ts, ChangePassword.test.tsx | Pass — `ffeead5` (local) + CI on PR |
+| FR-22 | F-16 Change own password | 3 | AC-76 – AC-80 | TEST-94 – TEST-98, TEST-100 | password-policy.test.ts, password.api.test.ts, ChangePassword.test.tsx, e2e/sprint3-demo.spec.ts | Pass — `ffeead5` (local) + CI on PR |
 | BR-01 | F-05 Allocation = total | 1 (+2 edit) | AC-25, AC-52 | TEST-28, TEST-29, TEST-51, TEST-70 | transaction-rules.test.ts, transactions.api.test.ts, rules.spec.ts, transaction-correction.api.test.ts | Pass — `v0.1.0` (D1) and regression at `ffeead5`; edit: Pass — `ffeead5` (local) + CI on PR |
 | BR-02 | F-05 Amount limits | 1 | AC-28, AC-52 | TEST-33, TEST-34, TEST-70 | transaction-input.test.ts, transaction-correction.api.test.ts | Pass — `v0.1.0` (D1) and regression at `ffeead5` |
 | BR-03 | F-05 Header type | 1 | AC-26 | TEST-30, TEST-31 | transaction-rules.test.ts | Pass — `v0.1.0` (D1) and regression at `ffeead5` |
@@ -128,14 +128,14 @@ Every other FR/BR/NFR has implemented behaviour and an executed, passing test.
 | AC-40 | S1 | Yes | TEST-47 | Pass — `v0.1.0` (D1) and regression at `ffeead5` |
 | AC-41 | S1 | Yes | TEST-48 | Pass — `v0.1.0` (D1) and regression at `ffeead5` |
 | AC-42 | S1 | Yes | TEST-49 | Pass — `v0.1.0` (D1) and regression at `ffeead5` |
-| AC-43 | S2 | Yes | TEST-62 | Pass — `ffeead5` (local) + CI on PR |
+| AC-43 | S2 | Yes | TEST-62, TEST-99 | Pass — `ffeead5` (local) + CI on PR |
 | AC-44 | S2 | Yes | TEST-60, TEST-62 | Pass — `ffeead5` (local) + CI on PR |
 | AC-45 | S2 | Yes | TEST-61, TEST-63 | Pass — `ffeead5` (local) + CI on PR |
 | AC-46 | S2 | Yes | TEST-63 | Pass — `ffeead5` (local) + CI on PR |
-| AC-47 | S2 | Yes | TEST-64 | Pass — `ffeead5` (local) + CI on PR |
+| AC-47 | S2 | Yes | TEST-64, TEST-99 | Pass — `ffeead5` (local) + CI on PR |
 | AC-48 | S2 | Yes | TEST-65 | Pass — `ffeead5` (local) + CI on PR |
 | AC-49 | S2 | Yes | TEST-66 | Pass — `ffeead5` (local) + CI on PR |
-| AC-50 | S2 | Yes | TEST-67 | Pass — `ffeead5` (local) + CI on PR |
+| AC-50 | S2 | Yes | TEST-67, TEST-99 | Pass — `ffeead5` (local) + CI on PR |
 | AC-51 | S2 | Yes | TEST-69, TEST-80 | Pass — `ffeead5` (local) + CI on PR |
 | AC-52 | S2 | Yes | TEST-70 | Pass — `ffeead5` (local) + CI on PR |
 | AC-53 | S2 | Yes | TEST-68, TEST-71 | Pass — `ffeead5` (local) + CI on PR |
@@ -161,11 +161,11 @@ Every other FR/BR/NFR has implemented behaviour and an executed, passing test.
 | AC-73 | S2 (F-14) | Yes | Lab 5 evidence C-01–C-06 | Pass — Lab 5 C-01–C-06 |
 | AC-74 | S2 (F-14) | Yes | Lab 5 evidence C-01–C-06 | Pass — Lab 5 C-01–C-06 |
 | AC-75 | S2 (F-14) | Yes | TEST-93 | Pass in Lab 5; re-run at `v0.2.0` (TEST-93) |
-| AC-76 | S3 (FR-22) | Yes | TEST-95 | Pass — `ffeead5` (local) + CI on PR |
+| AC-76 | S3 (FR-22) | Yes | TEST-95, TEST-100 | Pass — `ffeead5` (local) + CI on PR |
 | AC-77 | S3 (FR-22) | Yes | TEST-96 | Pass — `ffeead5` (local) + CI on PR |
 | AC-78 | S3 (FR-22) | Yes | TEST-94, TEST-96 | Pass — `ffeead5` (local) + CI on PR |
 | AC-79 | S3 (FR-22) | Yes | TEST-97 | Pass — `ffeead5` (local) + CI on PR |
-| AC-80 | S3 (FR-22) | Yes | TEST-98 | Pass — `ffeead5` (local) + CI on PR |
+| AC-80 | S3 (FR-22) | Yes | TEST-98, TEST-100 | Pass — `ffeead5` (local) + CI on PR |
 | AC-81 | S3 | No | planned | Planned (D3) — not run |
 | AC-82 | S3 | No | planned | Planned (D3) — not run |
 | AC-83 | S3 | No | planned | Planned (D3) — not run |
