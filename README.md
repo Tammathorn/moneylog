@@ -14,6 +14,11 @@ controls who can sign in but cannot see anyone's money.
 | System-level SDS | `docs/system-sds.md` |
 | Three-sprint plan | `docs/sprints/plan.md` |
 | Sprint 1 contracts, STS, DoD, results | `docs/sprints/sprint-1/` |
+| Sprint 2 contracts, STS, DoD, results | `docs/sprints/sprint-2/` |
+| Sprint 3 contracts and STS (progress) | `docs/sprints/sprint-3/` |
+| Change/defect register, remaining-work plan | `docs/change-register.md`, `docs/remaining-work.md` |
+| Deployment (Docker, CI/CD, GCP) | `docs/labs/lab-05/deployment.md` |
+| Lab 6 UAT plan | `docs/labs/lab-06/uat-plan.md` |
 
 ## Stack
 
@@ -79,6 +84,16 @@ E2E needs a `moneylog_e2e` database that the `moneylog` role can reset
 
 ## Workflow
 
-Each Issue gets a branch `feature/<n>-<slug>` from `sprint-1-staging`. Its PR goes into
-`sprint-1-staging` and the teammate reviews it. Then a release PR merges `sprint-1-staging` into
-`main`, and the release is tagged `v0.1.0`. Docker, CI/CD and GCP come in Lab 5 (system SDS §7).
+Each Issue gets a branch `feature/<n>-<slug>` from `staging` (Sprint 1 used `sprint-1-staging`).
+Its PR goes into `staging`; CI (`test-and-docker`) runs and the teammate reviews it. A release PR
+merges `staging` into `main`, which the ruleset `protect-main` allows only with one approval and a
+green `test-and-docker`. Every push to `main` builds the image, runs migrations, deploys to Cloud Run
+and smoke-tests `/api/version` (`.github/workflows/deploy.yml`). Releases: `v0.1.0` (Sprint 1),
+`v0.2.0` (Sprint 2 + Sprint 3 progress).
+
+### Docker
+
+```bash
+cp .env.example .env           # set ADMIN_PASSWORD / DEMO_USER_PASSWORD locally
+docker compose up --build      # db + migrate/seed job + app on http://localhost:3000
+```

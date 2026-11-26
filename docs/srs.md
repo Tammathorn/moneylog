@@ -5,7 +5,7 @@
 | Product | MoneyLog — Personal Money and Expense Logging System |
 | Theme | 7. Personal Money and Expense Logging System (CPE 334 Group Work Specification §6) |
 | Team | Tammathorn Kananurak (67070503489, @Tammathorn) · Chakriwat Srivilai (67070503407, @GusGusxz) |
-| Version | 1.0 — Sprint 1 baseline (see §9 for history) |
+| Version | 2.0 — Sprint 2 complete, Sprint 3 in progress (see §9 for history and approved revisions) |
 
 ## 1. Stakeholder problem and context
 
@@ -25,7 +25,7 @@ but has no business seeing anybody's money.
 
 | Actor | Role in system | Responsibilities | May NOT |
 |---|---|---|---|
-| User | `USER` | Signs in; sets opening balances; records payments/charges and money received; reads own balances, debts, summaries and history; (later) manages own accounts, favourites, duplicates | See or change another user's accounts, transactions or summaries; manage platform users |
+| User | `USER` | Signs in; sets opening balances; records payments/charges and money received; reads own balances, debts, summaries and history; manages own accounts; corrects or deletes own transactions; marks favourites and duplicates; reviews loans; changes own password | See or change another user's accounts, transactions or summaries; manage platform users |
 | Administrator | `ADMIN` | Signs in; lists platform users; enables or disables user sign-in | See or change any user's financial accounts, transactions, balances or summaries (BR-20); disable their own account (BR-22) |
 | Anonymous visitor | none | Can open the sign-in page only | Call any protected endpoint (NFR-01) |
 
@@ -73,7 +73,7 @@ IDs are stable. "Sprint" is the planned sprint (see `docs/traceability.md`).
 | FR-10 | A User sees a financial summary: total cash, each cash/bank balance, outstanding credit-card and other borrowing, outstanding loans given, total income, total expenses, net (income − expenses) and spending per expense category, optionally for a date range. | 1 |
 | FR-11 | An Administrator lists platform user accounts (name, e-mail, role, enabled). | 1 |
 | FR-12 | An Administrator enables or disables a user's sign-in. | 1 |
-| FR-13 | A User creates a financial account of any of the five types (name, type, subtype for Cash/Loan Taken). | 2 |
+| FR-13 | A User creates a financial account of any of the five types (name, type, subtype: required for Cash and Loan Taken, optional for Loan Given, none for Income/Expense). *Rev. 2.0: subtype rule made explicit.* | 2 |
 | FR-14 | A User renames or archives an account; an archived account keeps its history but cannot be used in new transactions. | 2 |
 | FR-15 | A User corrects a transaction (edit date, description, total, lines) or deletes it; balances are recomputed. | 2 |
 | FR-16 | A User searches and filters history by date range, account, kind, text and amount. | 2 |
@@ -95,7 +95,7 @@ Money is THB with two decimals, stored as integer **satang** (1 THB = 100 satang
 | BR-03 | A Payment's paying account is a Cash or Loan Taken account. Money received goes into a Cash account. | 1 |
 | BR-04 | Payment lines may target Expense, Loan Taken, Loan Given or Cash accounts. Receipt lines may target Income, Loan Given, Loan Taken or Cash accounts. Any other type is rejected. | 1 |
 | BR-05 | A line may not target the transaction's own paying/receiving account, and one account may appear at most once per transaction. A transaction has 1–20 lines. | 1 |
-| BR-06 | Every account referenced by a transaction or opening balance must belong to the signed-in user and be active. An account of another user is treated exactly like a non-existent one. | 1 |
+| BR-06 | Every account referenced by a transaction or opening balance must belong to the signed-in user and be active. An account of another user is treated exactly like a non-existent one. *Rev. 2.0: an own archived account is refused with `ACCOUNT_ARCHIVED`; when correcting a transaction, archived accounts already on it may stay (D-12).* | 1 |
 | BR-07 | Balance effects (amount *a*). **Payment** from Cash: paying −*a*; from Loan Taken: paying +*a* (debt grows). Payment lines: Expense +*a*, Loan Taken −*a* (repaid), Loan Given +*a* (lent), Cash +*a* (transfer in). **Receipt** into Cash: receiving +*a*. Receipt lines: Income +*a*, Loan Given −*a* (repaid to user), Loan Taken +*a* (borrowed), Cash −*a* (transfer out). Balance = opening balance + Σ effects. | 1 |
 | BR-08 | Only lines to Income accounts count as income and only lines to Expense accounts count as expenses. Transfers, borrowing, loan repayments, lending and opening balances are never income or expenses. | 1 |
 | BR-09 | Opening balances apply only to Cash, Loan Given and Loan Taken accounts, are ≥ 0.00 and ≤ 10,000,000.00 THB, and have an opening date. Setting it again replaces the previous value. | 1 |
@@ -106,7 +106,7 @@ Money is THB with two decimals, stored as integer **satang** (1 THB = 100 satang
 | BR-14 | A Cash balance may go below zero (the person may have logged out of order); the UI marks it as negative instead of rejecting the record. | 1 |
 | BR-15 | History is ordered by transaction date descending, then creation time descending. | 1 |
 | BR-16 | An archived account cannot be chosen in a new transaction but still appears in history and summaries. | 2 |
-| BR-17 | An account with transactions cannot be deleted, only archived. Its type cannot change once used. | 2 |
+| BR-17 | An account with transactions cannot be deleted, only archived. Its type cannot change once used or once it has an opening balance. *Rev. 2.0: opening balance added to the lock (D-14).* | 2 |
 | BR-18 | A Duplicate is not saved until the user submits it; it is validated as a new transaction. | 2 |
 | BR-19 | Favourite is a per-transaction flag visible only to the owner. | 2 |
 | BR-20 | An Administrator may not read or change any financial account, transaction, balance or summary — through any endpoint. | 1 |
@@ -138,7 +138,7 @@ Money is THB with two decimals, stored as integer **satang** (1 THB = 100 satang
 |---|---|
 | AS-01 | One currency (THB); amounts are entered with up to two decimals. |
 | AS-02 | "Today" is evaluated in Asia/Bangkok, the users' time zone. |
-| AS-03 | Seeded demo accounts are enough in Sprint 1; users do not create their own financial accounts until Sprint 2 (stakeholder brief "Later sprints"). |
+| AS-03 | Seeded demo accounts are enough in Sprint 1; users do not create their own financial accounts until Sprint 2 (stakeholder brief "Later sprints"). *Closed in 2.0: F-09 delivered.* |
 | AS-04 | Users log their own data; there is no shared household data. |
 | AS-05 | Loan Given / Loan Taken accounts are created per counterparty (e.g. "Loan to Beam", "KBank credit card"). |
 
@@ -158,11 +158,18 @@ Money is THB with two decimals, stored as integer **satang** (1 THB = 100 satang
 | D-10 | Is the opening date enforced against transaction dates? | Not in Sprint 1: the opening balance is the account's starting point regardless of date. Sprint 2 (FR-14 work) decides whether earlier transactions should warn. Recorded as open question Q-01. | 2026-11-14 |
 | D-11 | Another user's account id in a request? | Treated as non-existent: 422 `ACCOUNT_NOT_FOUND` for body references, 404 for path ids (BR-06). This does not reveal that the id exists. | 2026-11-14 |
 
-**Open questions:** Q-01 — should a transaction dated before an account's opening date warn or be
-refused? (owner: team; due Sprint 2 planning).
+| D-12 | Can a correction keep an account that was archived after the transaction was saved? | Yes. Otherwise old records could never be fixed; a *different* archived account is still refused (BR-06, BR-16). | 2026-11-25 |
+| D-13 | Are account names unique? | Per user, trimmed and case-insensitive, archived accounts included, so "KBank" and "kbank " cannot both exist and a restore never collides. | 2026-11-25 |
+| D-14 | When is the type locked? | Once any transaction uses the account **or** an opening balance is set, because an opening balance means different things for different types (BR-09, BR-17). | 2026-11-25 |
+| D-15 | Delete or soft-delete a transaction? | Hard delete of header and lines after an explicit confirmation; balances are derived, so nothing else needs updating (D-02). A history of edits is out of scope. | 2026-11-25 |
+| D-16 | Q-01: a transaction dated before the opening date? | Allowed without warning: the opening balance is the starting point the user chose, and loans/cards are often entered after the fact. Revisit only if UAT reports confusion. | 2026-11-26 |
+| D-17 | Who may change a password, and what happens to other sessions? | Each user changes only their own (no user id in the request); other sessions end at once, the current one stays (FR-22, BR-23 spirit). | 2026-11-26 |
+
+**Open questions:** none (Q-01 resolved by D-16).
 
 ## 9. Version history
 
 | Version | Date | Change |
 |---|---|---|
 | 1.0 | 2026-11-14 | Sprint 1 baseline. |
+| 2.0 | 2026-11-26 | Sprint 2 revision (approved by both students in PR review): FR-13 subtype rule explicit; BR-06 archived-account code and edit exception; BR-17 lock includes opening balance; decisions D-12–D-17; Q-01 resolved; AS-03 closed. No requirement removed or moved between sprints. |

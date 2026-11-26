@@ -63,6 +63,7 @@ Results are recorded in `docs/sprints/sprint-2/test-results.md` after execution.
 | Test | AC | Lvl | Action | Expected result | Where |
 |---|---|---|---|---|---|
 | TEST-92 | AC-09, AC-10 (extended) | A | New protected routes (POST/PATCH/DELETE accounts, PUT/DELETE transactions, favourite, GET loans) anonymous and as ADMIN | 401 AUTH_REQUIRED / 403 FORBIDDEN_ROLE, no data | access.api.test.ts |
+| TEST-99 | AC-43, AC-47, AC-50 | E | Archive through the real UI; the API refuses the archived Wallet (422 `ACCOUNT_ARCHIVED`, nothing saved); restore | Create, archive, refused, restore all as expected | e2e/sprint3-demo.spec.ts |
 | TEST-93 | AC-75 | E | Merge of the Sprint 2 release into `main` | Deploy demo green; smoke test: `/api/version` = merge SHA; critical journey + persisted record checked on the deployed URL | GitHub Actions run, `deploy/smoke_test.py` |
 
 ## Version history
@@ -70,3 +71,4 @@ Results are recorded in `docs/sprints/sprint-2/test-results.md` after execution.
 | Version | Date | Change |
 |---|---|---|
 | 1.0 | 2026-11-25 | Test design before implementation. |
+| 1.1 | 2026-11-26 | Added TEST-99 (E2E for F-09) as extra end-to-end evidence after implementation; no expected result of 1.0 changed. |
