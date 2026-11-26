@@ -1,4 +1,4 @@
-import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "../auth";
 import { Footer } from "./Footer";
 
@@ -19,6 +19,7 @@ export function Shell() {
         <div className="who">
           <span data-testid="current-user">{user.displayName}</span>
           <span className="role">{user.role === "ADMIN" ? "Administrator" : "User"}</span>
+          <Link className="topbar-link" to="/account/password">Change password</Link>
           <button type="button" className="link" onClick={async () => { await signOut(); navigate("/login"); }}>Sign out</button>
         </div>
       </header>

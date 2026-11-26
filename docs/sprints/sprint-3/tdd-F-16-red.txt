@@ -1,0 +1,33 @@
+# F-16 FR-22 red: commit 0cf1b29 (tests + stub)
+$ cd server && npx vitest run tests/unit/password-policy.test.ts tests/api/password.api.test.ts
+   × PUT /api/auth/password > TEST-95 changes the password, keeps this session and ends the others (AC-76) 198ms
+     → expected 404 to be 200 // Object.is equality
+   × PUT /api/auth/password > TEST-96 a wrong current password or a bad new password changes nothing (AC-77, AC-78) 119ms
+     → {"currentPassword":"Wrong-Pass-2026","newPassword":"Brand-New-Pass-2026"}: expected 404 to be 400 // Object.is equality
+   × PUT /api/auth/password > TEST-97 anonymous is refused; an administrator changes only their own password (AC-79) 3ms
+     → expected 404 to be 401 // Object.is equality
+   × TEST-94 checkNewPassword (AC-78) > rejects "xxxxxxxxxxx" 8ms
+     → expected { ok: true, value: '' } to deeply equal { ok: false, …(1) }
+   × TEST-94 checkNewPassword (AC-78) > rejects "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" 1ms
+     → expected { ok: true, value: '' } to deeply equal { ok: false, …(1) }
+   × TEST-94 checkNewPassword (AC-78) > rejects "" 1ms
+     → expected { ok: true, value: '' } to deeply equal { ok: false, …(1) }
+   × TEST-94 checkNewPassword (AC-78) > rejects undefined 1ms
+     → expected { ok: true, value: '' } to deeply equal { ok: false, …(1) }
+   × TEST-94 checkNewPassword (AC-78) > rejects 42 1ms
+     → expected { ok: true, value: '' } to deeply equal { ok: false, …(1) }
+   × TEST-94 checkNewPassword (AC-78) > rejects the current password again 1ms
+     → expected { ok: true, value: '' } to deeply equal { ok: false, …(1) }
+   × TEST-94 checkNewPassword (AC-78) > accepts 12 and 128 characters 1ms
+     → expected { ok: true, value: '' } to deeply equal { ok: true, value: 'xxxxxxxxxxxx' }
+   × TEST-94 checkNewPassword (AC-78) > requires the current password to be a string 1ms
+     → expected { ok: true, value: '' } to deeply equal { ok: false, fields: { …(1) } }
+ Test Files  2 failed (2)
+      Tests  11 failed (11)
+
+$ cd client && npx vitest run tests/ChangePassword.test.tsx
+   × TEST-98 change password page (AC-80) > checks that the new passwords match before sending 1024ms
+   × TEST-98 change password page (AC-80) > shows a server field error, then the success message 1004ms
+   × TEST-98 change password page (AC-80) > is linked from the top bar for both roles 1004ms
+ Test Files  1 failed (1)
+      Tests  3 failed (3)
