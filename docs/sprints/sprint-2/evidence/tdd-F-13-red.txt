@@ -1,0 +1,24 @@
+# F-13 red: commit 216bd43 (tests + stub)
+$ cd server && npx vitest run tests/unit/loans.test.ts tests/api/loans.api.test.ts
+   × GET /api/loans > TEST-88 outstanding equals the account balance; history and totals (AC-68, AC-69) 8ms
+     → expected 404 to be 200 // Object.is equality
+   × GET /api/loans > TEST-89 only the caller's loans; admin 403; anonymous 401 (AC-70) 3ms
+     → res.body.given is not iterable
+   × GET /api/loans > TEST-90 archived loans are listed only while something is outstanding (AC-71) 36ms
+     → Cannot read properties of undefined (reading 'map')
+   × TEST-87 loanHistory (AC-68, AC-69) > Loan Given: opening first, then lend (+) and repayment (−) in date order with a running balance 8ms
+     → expected [] to deeply equal [ { transactionId: null, …(5) }, …(2) ]
+   × TEST-87 loanHistory (AC-68, AC-69) > Loan Taken: a card charge as header (+) and a repayment as line (−) 1ms
+     → expected [] to deeply equal [ [ 20, 185000, 185000 ], …(1) ]
+   × TEST-87 loanHistory (AC-68, AC-69) > the outstanding always equals the balance engine (BR-07, BR-13) 1ms
+     → expected +0 to be 350000 // Object.is equality
+   × TEST-87 loanHistory (AC-68, AC-69) > orders same-day rows by creation time, then id 1ms
+     → expected [] to deeply equal [ 30, 31 ]
+ Test Files  2 failed (2)
+      Tests  7 failed | 1 passed (8)
+
+$ cd client && npx vitest run tests/Loans.test.tsx
+   × TEST-91 Loans page (AC-72) > shows both sections with totals, outstanding and history rows 1030ms
+   × TEST-91 Loans page (AC-72) > shows the empty message when a section has no loans 1004ms
+ Test Files  1 failed (1)
+      Tests  2 failed (2)

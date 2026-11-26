@@ -1,0 +1,14 @@
+# F-13 green: commit 8431dd7
+$ cd server && npx vitest run tests/unit/loans.test.ts tests/api/loans.api.test.ts tests/api/access.api.test.ts
+ ✓ tests/api/loans.api.test.ts (3 tests) 410ms
+ ✓ tests/api/access.api.test.ts (26 tests) 308ms
+ ✓ tests/unit/loans.test.ts (5 tests) 17ms
+ Test Files  3 passed (3)
+      Tests  34 passed (34)
+
+$ cd client && npx vitest run tests/Loans.test.tsx
+ ✓ tests/Loans.test.tsx (2 tests) 170ms
+ Test Files  1 passed (1)
+      Tests  2 passed (2)
+
+$ npx playwright test  ->  5 passed
