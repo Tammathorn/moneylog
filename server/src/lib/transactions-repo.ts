@@ -26,3 +26,8 @@ export function transactionDto(t: Row) {
     lines: t.lines.map((l) => ({ id: l.id, amountSatang: l.amountSatang, note: l.note, account: l.account })),
   };
 }
+
+// F-10 (AC-51, AC-56): stub committed with the tests (TDD red); implemented next.
+export async function replaceTransaction(_prisma: PrismaClient, _id: number, _input: TransactionInput): Promise<void> {
+  throw new Error("not implemented");
+}

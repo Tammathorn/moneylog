@@ -65,3 +65,8 @@ export function archivedAccountUse(input: TransactionInput, own: OwnAccount[], k
 export function usableAccounts(own: OwnAccount[], keep: ReadonlySet<number> = new Set()): Map<number, RuleAccount> {
   return new Map(own.filter((a) => a.isActive || keep.has(a.id)).map((a) => [a.id, { id: a.id, type: a.type }]));
 }
+
+// F-10 (AC-53): stub committed with the tests (TDD red); implemented next.
+export function editableAccounts(_own: OwnAccount[], _saved: { accountId: number; lines: { accountId: number }[] }) {
+  return { usable: new Map<number, RuleAccount>(), keep: new Set<number>() as ReadonlySet<number> };
+}
