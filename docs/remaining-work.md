@@ -10,13 +10,13 @@ video. Owners: **TK** = Tammathorn Kananurak, **CS** = Chakriwat Srivilai.
 |---|---|---|---|---|
 | F-09 – F-13 | Implemented; AC-43 – AC-72 tested and passing on PRs #46 – #49 | Teammate review and merge into `staging`; release `v0.2.0` to `main`; TEST-93 on the deployed candidate | CS review | CS review by 2026-11-28; TK release by 2026-11-29 |
 | F-16 FR-22 change own password | Implemented; AC-76 – AC-80 tested (TEST-94 – TEST-98) | Merge with `v0.2.0` | PR #50 review | CS by 2026-11-28 |
-| F-16 FR-21 admin creates user (#53) | Contract (AC-81) written; not implemented | Migration `mustChangePassword`, `POST /api/admin/users`, forced change at first sign-in, tests | FR-22 (done) | TK, implemented 2026-11-30; tested 2026-12-12 |
-| F-15 Monthly reports (#54) | Contract (AC-82 – AC-85) written; not implemented | `monthlyReport()` + API + Reports page + tests | F-07, F-11 | CS, 2026-11-30 (code) / 2026-12-12 (verification) |
-| F-17 NFR-12 rate limit (#55) | Contract (AC-86) written; not implemented | Sliding-window limiter on login + API test with fake clock | — | TK, 2026-11-30 |
-| F-17 NFR-10 performance (#56) | Contract (AC-87); design index exists | Seed 2,000 transactions; `perf_smoke.py`; record p95 local and Cloud Run | F-11 | CS, 2026-12-12 |
-| F-17 NFR-11 responsive/accessible (#57) | Contract (AC-88) | Playwright at 390/834/1280 px, axe check, keyboard run of the journey | all screens | TK, 2026-12-12 |
+| F-16 FR-21 admin creates user | Contract (AC-81) written; not implemented | Migration `mustChangePassword`, `POST /api/admin/users`, forced change at first sign-in, tests | FR-22 (done) | TK, implemented 2026-11-30; tested 2026-12-12 |
+| F-15 Monthly reports | Contract (AC-82 – AC-85) written; not implemented | `monthlyReport()` + API + Reports page + tests | F-07, F-11 | CS, 2026-11-30 (code) / 2026-12-12 (verification) |
+| F-17 NFR-12 rate limit | Contract (AC-86) written; not implemented | Sliding-window limiter on login + API test with fake clock | — | TK, 2026-11-30 |
+| F-17 NFR-10 performance | Contract (AC-87); design index exists | Seed 2,000 transactions; `perf_smoke.py`; record p95 local and Cloud Run | F-11 | CS, 2026-12-12 |
+| F-17 NFR-11 responsive/accessible | Contract (AC-88) | Playwright at 390/834/1280 px, axe check, keyboard run of the journey | all screens | TK, 2026-12-12 |
 | CR-07 Dependabot PR #29 | Open (deferred) | Merge only with green CI after the final release candidate | — | CS, 2026-12-12 |
-| CR-09 Lab 6 UAT findings (#58) | Pending (partner team testing) | Triage each finding as DEF-xx, fix with red/green test, re-test with partner | Partner team | TK + CS, fixes by 2026-11-30, re-test by 2026-12-12 |
+| CR-09 Lab 6 UAT findings | Pending (partner team testing) | Triage each finding as DEF-xx, fix with red/green test, re-test with partner | Partner team | TK + CS, fixes by 2026-11-30, re-test by 2026-12-12 |
 | CR-10 Lab 7 findings | Pending | Same process as CR-09 | Lab 7 | TK + CS, by 2026-12-12 |
 
 ## 2. Dated plan
