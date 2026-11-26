@@ -64,4 +64,13 @@ test("TEST-80 alice corrects a card purchase, duplicates it and deletes the dupl
   await page.getByRole("button", { name: "Apply" }).click();
   await expect(page.getByRole("table", { name: "Transactions" }).getByText("E2E Central World")).toHaveCount(1);
   await shot(page, "12-history-favourites", SHOTS2);
+
+  // The Loans page uses the same balances (F-13): the card's outstanding equals its account balance.
+  await page.getByRole("navigation").getByRole("link", { name: "Loans" }).click();
+  const card = (await balances(page))["KTC Credit Card"];
+  const owe = page.getByRole("region", { name: "Money I owe" });
+  await expect(owe.getByText("KTC Credit Card")).toBeVisible();
+  await expect(owe.locator("details", { hasText: "KTC Credit Card" }).locator(".loan-outstanding")).toContainText(
+    new Intl.NumberFormat("en-US", { minimumFractionDigits: 2 }).format(card / 100));
+  await shot(page, "13-loans", SHOTS2);
 });

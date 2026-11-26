@@ -7,7 +7,7 @@ export function Shell() {
   const navigate = useNavigate();
   if (!user) return null;
   const links = user.role === "USER"
-    ? [["/", "Overview"], ["/accounts", "Accounts"], ["/transactions/new", "New transaction"], ["/transactions", "History"]]
+    ? [["/", "Overview"], ["/accounts", "Accounts"], ["/transactions/new", "New transaction"], ["/transactions", "History"], ["/loans", "Loans"]]
     : [["/admin/users", "Users"]];
   return (
     <div className="app">
