@@ -20,6 +20,7 @@ const FINANCIAL: [Method, string][] = [
 const SPRINT2: [Method, string][] = [
   ["post", "/api/accounts"], ["patch", "/api/accounts/1"], ["delete", "/api/accounts/1"],
   ["put", "/api/transactions/1"], ["delete", "/api/transactions/1"], ["put", "/api/transactions/1/favourite"],
+  ["get", "/api/loans"],
 ];
 const ADMIN: [Method, string][] = [["get", "/api/admin/users"], ["patch", "/api/admin/users/1"]];
 const SESSION: [Method, string][] = [["get", "/api/auth/me"], ["post", "/api/auth/logout"]];

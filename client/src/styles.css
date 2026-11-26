@@ -79,3 +79,6 @@ label.check { display: flex; gap: 6px; align-items: center; }
 .filter-grid label { margin: 0; } .filters .row { margin-top: 10px; }
 .pager { display: flex; gap: 8px; align-items: center; justify-content: flex-end; margin-top: 8px; }
 .pager span { margin-right: auto; }
+details.loan { border-top: 1px solid #e6e9ed; padding: 8px 0; }
+details.loan summary { cursor: pointer; display: flex; gap: 6px; align-items: baseline; flex-wrap: wrap; font-weight: 600; }
+.loan-outstanding { margin-left: auto; font-weight: 400; }
