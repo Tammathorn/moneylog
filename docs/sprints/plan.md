@@ -36,3 +36,18 @@ teammate → integration tests on staging → release PR `sprint-1-staging` → 
 
 Sprint 2: FR-13–FR-19, BR-16–BR-19, NFR-07–NFR-09 (with Lab 5). Sprint 3: FR-20–FR-22,
 NFR-10–NFR-12 verification, Q-01 resolution, defects from Labs 6–7.
+
+## Sprint 2 Issues (added 2026-11-25)
+
+Sprint 2 uses the Lab 5 branch flow: feature branch from `staging` → PR into `staging` reviewed by
+the teammate → release PR `staging` → `main` (ruleset) → automatic deploy → tag `v0.2.0`.
+
+| # | Issue | Branch | Features | Contract |
+|---|---|---|---|---|
+| 39 | Sprint 2 contracts, STS and DoD | `feature/39-sprint-2-contracts` | F-09–F-14 (docs) | `docs/sprints/sprint-2/` |
+| 40 | Account management | `feature/40-account-management` | F-09 | `F-09-account-management.md` |
+| 41 | Transaction correction, favourites, Duplicate | `feature/41-correction-favourites` | F-10, F-12 | `F-10-F-12-correction-favourites.md` |
+| 42 | History search, filter, pagination | `feature/42-history-filter` | F-11 | `F-11-history-filter.md` |
+| 43 | Loan overview | `feature/43-loan-overview` | F-13 | `F-13-loan-overview.md` |
+| 16–23, 33 | Lab 5 delivery pipeline (done) | Lab 5 branches | F-14 | `F-14-delivery-pipeline.md` |
+| 44 | Sprint 3 contracts + change own password | `feature/44-sprint-3` | F-15–F-17 (docs), F-16 FR-22 | `docs/sprints/sprint-3/` |
