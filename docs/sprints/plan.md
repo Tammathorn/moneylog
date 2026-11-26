@@ -51,3 +51,22 @@ the teammate → release PR `staging` → `main` (ruleset) → automatic deploy 
 | 43 | Loan overview | `feature/43-loan-overview` | F-13 | `F-13-loan-overview.md` |
 | 16–23, 33 | Lab 5 delivery pipeline (done) | Lab 5 branches | F-14 | `F-14-delivery-pipeline.md` |
 | 44 | Sprint 3 contracts + change own password | `feature/44-sprint-3` | F-15–F-17 (docs), F-16 FR-22 | `docs/sprints/sprint-3/` |
+
+## Sprint 3 plan (added 2026-11-26)
+
+Sprint 3 runs 2026-11-26 – 2026-12-13 around the examination period (1–11 December): product code first,
+December only for verification, defects, UAT re-tests and the video. Contracts: `docs/sprints/sprint-3/`.
+
+| # | Issue | Feature / AC | Owner | Depends on | Code by | Verified by | Status (2026-11-26) |
+|---|---|---|---|---|---|---|---|
+| 44 | Sprint 3 contracts + change own password | F-16 FR-22, AC-76 – AC-80 | Tammathorn | F-01 | 2026-11-26 | 2026-11-26 | Implemented + tested (PR #50) |
+| 53 | Admin creates user with temporary password | F-16 FR-21, AC-81 | Tammathorn | #44 | 2026-11-30 | 2026-12-12 | Planned |
+| 54 | Monthly reports | F-15 FR-20, AC-82 – AC-85 | Chakriwat | F-07, F-11 | 2026-11-30 | 2026-12-12 | Planned |
+| 55 | Sign-in rate limit | F-17 NFR-12, AC-86 | Tammathorn | — | 2026-11-30 | 2026-12-12 | Planned |
+| 56 | Performance smoke | F-17 NFR-10, AC-87 | Chakriwat | F-11 | — | 2026-12-12 | Planned |
+| 57 | Responsive and accessibility pass | F-17 NFR-11, AC-88 | Tammathorn | all screens | — | 2026-12-12 | Planned |
+| 58 | Lab 6 UAT findings (Pakato): triage, RED/GREEN fixes, re-test | DEF-xx | Chakriwat (+ Tammathorn) | Pakato sessions | 2026-11-30 | 2026-12-12 | Waiting for findings |
+| 59 | Final release `v1.0.0`, regression, video | AC-89 | Tammathorn | all above | — | 2026-12-13 | Planned |
+
+Milestones: 2026-11-29 release `v0.2.0` (Sprint 2 + FR-22) and D2 · 2026-11-30 remaining Sprint 3 code on
+branches · 2026-12-12 verification, UAT re-tests, video · 2026-12-13 `v1.0.0` deployed and tagged.
