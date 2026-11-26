@@ -69,3 +69,9 @@ button.link { border: none; background: none; color: var(--primary); padding: 4p
 .app-footer code { background: #e8edf2; padding: 1px 6px; border-radius: 4px; }
 .login { grid-template-rows: 1fr auto; }
 button.link.danger { color: var(--danger); }
+button.star { border: none; background: none; font-size: 1.25rem; line-height: 1; padding: 4px 6px; min-height: auto; color: #9aa5b1; }
+button.star.on { color: #d29b00; }
+button.danger { background: var(--danger); color: #fff; border-color: var(--danger); }
+.confirm { border: 1px solid #f5c2bd; background: #fdecea; padding: 10px 12px; border-radius: 8px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.confirm p { margin: 0; flex-basis: 100%; }
+label.check { display: flex; gap: 6px; align-items: center; }

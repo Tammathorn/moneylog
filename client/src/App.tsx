@@ -28,6 +28,7 @@ export function App() {
         <Route path="/transactions" element={<For role="USER"><History /></For>} />
         <Route path="/transactions/new" element={<For role="USER"><NewTransaction /></For>} />
         <Route path="/transactions/:id" element={<For role="USER"><TransactionDetail /></For>} />
+        <Route path="/transactions/:id/edit" element={<For role="USER"><NewTransaction /></For>} />
         <Route path="/admin/users" element={<For role="ADMIN"><AdminUsers /></For>} />
         <Route path="*" element={<p>Page not found.</p>} />
       </Route>

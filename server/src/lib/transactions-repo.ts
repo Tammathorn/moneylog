@@ -22,7 +22,22 @@ type Row = Prisma.MoneyTransactionGetPayload<{ include: typeof transactionInclud
 export function transactionDto(t: Row) {
   return {
     id: t.id, kind: t.kind, date: fromDbDate(t.date), totalSatang: t.totalSatang, description: t.description,
-    createdAt: t.createdAt.toISOString(), account: t.account,
+    createdAt: t.createdAt.toISOString(), updatedAt: t.updatedAt?.toISOString() ?? null, isFavourite: t.isFavourite, account: t.account,
     lines: t.lines.map((l) => ({ id: l.id, amountSatang: l.amountSatang, note: l.note, account: l.account })),
   };
+}
+
+// F-10 (AC-51, AC-56, NFR-05): replace the header fields and all lines in one DB transaction.
+// id, userId, createdAt and isFavourite are kept. Any failure rolls back to the old rows.
+export async function replaceTransaction(prisma: PrismaClient, id: number, input: TransactionInput): Promise<void> {
+  await prisma.$transaction(async (db) => {
+    await db.moneyTransaction.update({
+      where: { id },
+      data: { kind: input.kind, accountId: input.accountId, date: toDbDate(input.date), totalSatang: input.totalSatang, description: input.description, updatedAt: new Date() },
+    });
+    await db.transactionLine.deleteMany({ where: { transactionId: id } });
+    for (const l of input.lines) {
+      await db.transactionLine.create({ data: { transactionId: id, accountId: l.accountId, amountSatang: l.amountSatang, note: l.note } });
+    }
+  });
 }

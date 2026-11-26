@@ -1,0 +1,17 @@
+# F-10/F-12 green: commit 7a71561
+$ cd server && npx vitest run tests/unit/transaction-rules.test.ts tests/api/transaction-correction.api.test.ts tests/api/favourites.api.test.ts tests/api/access.api.test.ts
+ ✓ tests/api/transaction-correction.api.test.ts (6 tests) 523ms
+ ✓ tests/unit/transaction-rules.test.ts (14 tests) 20ms
+ ✓ tests/api/access.api.test.ts (25 tests) 283ms
+ ✓ tests/api/favourites.api.test.ts (2 tests) 356ms
+ Test Files  4 passed (4)
+      Tests  47 passed (47)
+
+$ cd client && npx vitest run tests/TransactionDetail.test.tsx
+ ✓ tests/TransactionDetail.test.tsx (6 tests) 568ms
+   ✓ TEST-77 edit and delete from the detail page (AC-57) > Edit opens the form pre-filled and Save changes sends a PUT 365ms
+ Test Files  1 passed (1)
+      Tests  6 passed (6)
+
+$ npx playwright test   (E2E, incl. Sprint 1 regression)
+  5 passed: TEST-52, TEST-09, TEST-50, TEST-51, TEST-80

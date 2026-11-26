@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { api, ApiError, GENERIC, type Account, type AccountType, type Transaction } from "../api";
 import { ErrorAlert, Status } from "../components/Money";
 import { formatThb, parseThb, todayBangkok, TYPE_LABEL } from "../money";
@@ -12,7 +12,16 @@ const MAX_LINES = 20;
 interface LineState { accountId: string; amount: string; note: string }
 const emptyLine = (): LineState => ({ accountId: "", amount: "", note: "" });
 
+const toThb = (satang: number) => (satang / 100).toFixed(2);
+
+// F-05 new transaction; F-10 edit (/transactions/:id/edit); F-12 Duplicate (/transactions/new?from=:id).
 export function NewTransaction() {
+  const { id: editId } = useParams();
+  const [search] = useSearchParams();
+  const fromId = search.get("from");
+  const navigate = useNavigate();
+  const [keep, setKeep] = useState<Set<number>>(new Set());
+  const [notice, setNotice] = useState<string | null>(null);
   const [accounts, setAccounts] = useState<Account[] | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [kind, setKind] = useState<Kind>("PAYMENT");
@@ -27,8 +36,36 @@ export function NewTransaction() {
   const [saved, setSaved] = useState<Transaction | null>(null);
 
   useEffect(() => {
-    api<{ accounts: Account[] }>("/accounts").then((r) => setAccounts(r.accounts), (e) => setLoadError(e instanceof ApiError ? e.message : GENERIC));
-  }, []);
+    const sourceId = editId ?? fromId;
+    Promise.all([
+      api<{ accounts: Account[] }>("/accounts"),
+      sourceId ? api<{ transaction: Transaction }>(`/transactions/${sourceId}`) : Promise.resolve(null),
+    ]).then(([r, src]) => {
+      if (src) prefill(src.transaction, r.accounts);
+      setAccounts(r.accounts);
+    }, (e) => setLoadError(e instanceof ApiError ? e.message : GENERIC));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editId, fromId]);
+
+  // Fill the form from a saved transaction. Edit keeps the date and may keep archived accounts already on it (AC-53);
+  // Duplicate uses today's date and leaves archived accounts empty with a message (AC-65, AC-66, BR-18).
+  function prefill(t: Transaction, list: Account[]) {
+    const active = new Set(list.filter((a) => a.isActive).map((a) => a.id));
+    const archivedNames: string[] = [];
+    const pick = (ref: { id: number; name: string }) => {
+      if (editId || active.has(ref.id)) return String(ref.id);
+      archivedNames.push(ref.name);
+      return "";
+    };
+    setKind(t.kind);
+    setAccountId(pick(t.account));
+    setDate(editId ? t.date : todayBangkok());
+    setTotal(toThb(t.totalSatang));
+    setDescription(t.description ?? "");
+    setLines(t.lines.map((l) => ({ accountId: pick(l.account), amount: toThb(l.amountSatang), note: l.note ?? "" })));
+    if (editId) setKeep(new Set([t.account.id, ...t.lines.map((l) => l.account.id)]));
+    if (archivedNames.length) setNotice(archivedNames.map((n) => `${n} is archived — choose another account.`).join(" "));
+  }
 
   const totalSatang = parseThb(total);
   const allocated = lines.reduce((s, l) => s + (parseThb(l.amount) ?? 0), 0);
@@ -38,9 +75,9 @@ export function NewTransaction() {
 
   const options = useMemo(() => (types: AccountType[], exclude: string[]) =>
     types.map((t) => {
-      const list = (accounts ?? []).filter((a) => a.type === t && a.isActive && !exclude.includes(String(a.id)));
+      const list = (accounts ?? []).filter((a) => a.type === t && (a.isActive || keep.has(a.id)) && !exclude.includes(String(a.id)));
       return list.length ? <optgroup key={t} label={TYPE_LABEL[t]}>{list.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}</optgroup> : null;
-    }), [accounts]);
+    }), [accounts, keep]);
 
   function switchKind(k: Kind) {
     setKind(k);
@@ -58,14 +95,15 @@ export function NewTransaction() {
     setError(null);
     setFields({});
     try {
-      const r = await api<{ transaction: Transaction }>("/transactions", {
-        method: "POST",
+      const r = await api<{ transaction: Transaction }>(editId ? `/transactions/${editId}` : "/transactions", {
+        method: editId ? "PUT" : "POST",
         body: {
           kind, accountId: Number(accountId), date, totalSatang, description: description || undefined,
           lines: lines.map((l) => ({ accountId: Number(l.accountId), amountSatang: parseThb(l.amount), note: l.note || undefined })),
         },
       });
-      setSaved(r.transaction);
+      if (editId) navigate(`/transactions/${editId}`, { state: { transaction: r.transaction } });
+      else setSaved(r.transaction);
     } catch (err) {
       if (err instanceof ApiError) {
         setFields(err.fields);
@@ -91,8 +129,9 @@ export function NewTransaction() {
 
   return (
     <section>
-      <h1>New transaction</h1>
+      <h1>{editId ? "Edit transaction" : "New transaction"}</h1>
       <ErrorAlert message={loadError} />
+      {notice && <p className="notice" role="status">{notice}</p>}
       {!accounts && !loadError && <Status>Loading…</Status>}
       {accounts && (
         <form className="card tx-form" onSubmit={submit} noValidate>
@@ -151,7 +190,7 @@ export function NewTransaction() {
             Allocated <strong data-testid="allocated">{formatThb(allocated)}</strong> · Remaining{" "}
             <strong data-testid="remaining" className={remaining !== 0 ? "negative" : ""}>{formatThb(remaining)}</strong>
           </p>
-          <button type="submit" className="primary" disabled={!canSave}>{busy ? "Saving…" : "Save transaction"}</button>
+          <button type="submit" className="primary" disabled={!canSave}>{busy ? "Saving…" : editId ? "Save changes" : "Save transaction"}</button>
         </form>
       )}
     </section>

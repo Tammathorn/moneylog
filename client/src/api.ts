@@ -10,6 +10,7 @@ export interface Account {
 export interface AccountRef { id: number; name: string; type: AccountType }
 export interface Transaction {
   id: number; kind: "PAYMENT" | "RECEIPT"; date: string; totalSatang: number; description: string | null; createdAt: string;
+  updatedAt?: string | null; isFavourite?: boolean;
   account: AccountRef; lines: { id: number; amountSatang: number; note: string | null; account: AccountRef }[];
 }
 export interface Summary {
