@@ -1,4 +1,7 @@
 import { Router } from "express";
+import type { Prisma } from "@prisma/client";
+import { parseHistoryFilter } from "../domain/history-filter.js";
+import { toDbDate } from "../domain/dates.js";
 import { getPrisma } from "../prisma.js";
 import { handle, parseId, sendError, sendNotFound, sendValidation } from "../lib/http-error.js";
 import { authOf, userOnly } from "../middleware/auth.js";
@@ -24,15 +27,30 @@ transactionsRouter.post("/", handle(async (req, res) => {
   res.status(201).json({ transaction: transactionDto(saved) });
 }));
 
-// F-06 - AC-32, BR-15.
+// F-06 - AC-32, BR-15; F-11 - AC-58..AC-61: every filter runs in the DB and always starts with the caller's userId.
 transactionsRouter.get("/", handle(async (req, res) => {
-  const limit = Math.min(Math.max(Number.parseInt(String(req.query.limit ?? "50"), 10) || 50, 1), 100);
-  const offset = Math.max(Number.parseInt(String(req.query.offset ?? "0"), 10) || 0, 0);
-  const where: { userId: number; isFavourite?: boolean } = { userId: authOf(res).user.id };
-  if (req.query.favourite === "true") where.isFavourite = true; // F-12 AC-64 (F-11 adds the full filter set)
+  const parsed = parseHistoryFilter(req.query as Record<string, unknown>);
+  if (!parsed.ok) return sendValidation(res, parsed.fields);
+  const f = parsed.value;
+  const where: Prisma.MoneyTransactionWhereInput = { userId: authOf(res).user.id };
+  const and: Prisma.MoneyTransactionWhereInput[] = [];
+  if (f.from || f.to) where.date = { ...(f.from && { gte: toDbDate(f.from) }), ...(f.to && { lte: toDbDate(f.to) }) };
+  if (f.kind) where.kind = f.kind;
+  if (f.favourite) where.isFavourite = true;
+  if (f.minSatang !== undefined || f.maxSatang !== undefined) {
+    where.totalSatang = { ...(f.minSatang !== undefined && { gte: f.minSatang }), ...(f.maxSatang !== undefined && { lte: f.maxSatang }) };
+  }
+  if (f.accountId) and.push({ OR: [{ accountId: f.accountId }, { lines: { some: { accountId: f.accountId } } }] });
+  if (f.q) {
+    and.push({ OR: [
+      { description: { contains: f.q, mode: "insensitive" } },
+      { lines: { some: { note: { contains: f.q, mode: "insensitive" } } } },
+    ] });
+  }
+  if (and.length) where.AND = and;
   const prisma = getPrisma();
   const [items, total] = await Promise.all([
-    prisma.moneyTransaction.findMany({ where, include: transactionInclude, orderBy: [{ date: "desc" }, { createdAt: "desc" }, { id: "desc" }], take: limit, skip: offset }),
+    prisma.moneyTransaction.findMany({ where, include: transactionInclude, orderBy: [{ date: "desc" }, { createdAt: "desc" }, { id: "desc" }], take: f.limit, skip: f.offset }),
     prisma.moneyTransaction.count({ where }),
   ]);
   res.json({ items: items.map(transactionDto), total });

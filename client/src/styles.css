@@ -75,3 +75,7 @@ button.danger { background: var(--danger); color: #fff; border-color: var(--dang
 .confirm { border: 1px solid #f5c2bd; background: #fdecea; padding: 10px 12px; border-radius: 8px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 .confirm p { margin: 0; flex-basis: 100%; }
 label.check { display: flex; gap: 6px; align-items: center; }
+.filter-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px 12px; align-items: end; }
+.filter-grid label { margin: 0; } .filters .row { margin-top: 10px; }
+.pager { display: flex; gap: 8px; align-items: center; justify-content: flex-end; margin-top: 8px; }
+.pager span { margin-right: auto; }

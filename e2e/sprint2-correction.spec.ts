@@ -33,6 +33,7 @@ test("TEST-80 alice corrects a card purchase, duplicates it and deletes the dupl
   await shot(page, "10-edit-transaction", SHOTS2);
   await page.getByRole("button", { name: "Save changes" }).click();
   await expect(page.getByRole("heading", { name: /Payment · ฿1,650\.00/ })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Duplicate" })).toBeVisible();
   await expect(page.getByText(/^Edited /)).toBeVisible();
   const afterEdit = await balances(page);
   expect(afterEdit["KTC Credit Card"] - before["KTC Credit Card"]).toBe(165000);
@@ -44,8 +45,10 @@ test("TEST-80 alice corrects a card purchase, duplicates it and deletes the dupl
   await expect(page.getByRole("button", { name: "Remove from favourites" })).toHaveAttribute("aria-pressed", "true");
   await page.getByRole("link", { name: "Duplicate" }).click();
   await expect(page.getByLabel("Description")).toHaveValue("E2E Central World");
+  await expect(page.getByRole("button", { name: "Save transaction" })).toBeEnabled();
   expect(await historyTotal(page)).toBe(count + 1);
   await page.getByRole("button", { name: "Save transaction" }).click();
+  await expect(page.getByRole("heading", { name: "Transaction saved" })).toBeVisible();
   expect(await historyTotal(page)).toBe(count + 2);
   await page.getByRole("link", { name: "View transaction" }).click();
 
