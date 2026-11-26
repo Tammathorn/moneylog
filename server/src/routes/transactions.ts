@@ -3,7 +3,7 @@ import { getPrisma } from "../prisma.js";
 import { handle, parseId, sendError, sendNotFound, sendValidation } from "../lib/http-error.js";
 import { authOf, userOnly } from "../middleware/auth.js";
 import { parseTransactionInput } from "../domain/transaction-input.js";
-import { validateTransactionRules } from "../domain/transaction-rules.js";
+import { archivedAccountUse, usableAccounts, validateTransactionRules } from "../domain/transaction-rules.js";
 import { insertTransaction, transactionDto, transactionInclude } from "../lib/transactions-repo.js";
 
 export const transactionsRouter = Router();
@@ -15,8 +15,8 @@ transactionsRouter.post("/", handle(async (req, res) => {
   if (!parsed.ok) return sendValidation(res, parsed.fields);
   const userId = authOf(res).user.id;
   const prisma = getPrisma();
-  const own = await prisma.account.findMany({ where: { userId, isActive: true }, select: { id: true, type: true } });
-  const ruleError = validateTransactionRules(parsed.value, new Map(own.map((a) => [a.id, a])));
+  const own = await prisma.account.findMany({ where: { userId }, select: { id: true, type: true, name: true, isActive: true } });
+  const ruleError = archivedAccountUse(parsed.value, own) ?? validateTransactionRules(parsed.value, usableAccounts(own));
   if (ruleError) return sendError(res, 422, ruleError.code, ruleError.message);
 
   const id = await insertTransaction(prisma, userId, parsed.value);

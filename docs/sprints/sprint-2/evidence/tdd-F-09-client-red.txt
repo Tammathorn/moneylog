@@ -1,0 +1,8 @@
+$ cd client && npx vitest run tests/Accounts.test.tsx tests/NewTransaction.test.tsx   # before the Accounts page change
+   × TEST-67 account management on the Accounts page (AC-50) > creates an account and shows it in its type group 1010ms
+   × TEST-67 account management on the Accounts page (AC-50) > archives an account into the Archived section and restores it 1005ms
+   × TEST-67 account management on the Accounts page (AC-50) > offers Delete only for unused accounts and shows the in-use error 1004ms
+ ✓ tests/NewTransaction.test.tsx (2 tests) 407ms
+   ✓ TEST-37 transaction form (AC-31) > updates Remaining live, enables Save only at zero, and keeps values on a server rule error 391ms
+ Test Files  1 failed | 1 passed (2)
+      Tests  3 failed | 3 passed (6)

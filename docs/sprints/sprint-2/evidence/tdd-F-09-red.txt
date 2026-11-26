@@ -1,0 +1,74 @@
+# F-09 red: commit 7d74713 (tests + stub)
+$ git rev-parse --short HEAD
+7d74713
+$ cd server && npx vitest run tests/unit/account-rules.test.ts tests/api/account-management.api.test.ts
+   × POST /api/accounts > TEST-62 creates an owned account with balance 0 (AC-43) 16ms
+     → expected 404 to be 201 // Object.is equality
+   × POST /api/accounts > TEST-62 rejects invalid bodies with the field named and creates nothing (AC-44) 6ms
+     → {"name":"","type":"EXPENSE"}: expected 404 to be 400 // Object.is equality
+   × Unique names and rename > TEST-63 refuses a duplicate name ignoring case and spaces; other users may reuse it (AC-45) 4ms
+     → expected 404 to be 409 // Object.is equality
+   × Unique names and rename > TEST-63 a duplicate name also counts archived accounts (AC-45) 4ms
+     → Cannot read properties of undefined (reading 'id')
+   × Unique names and rename > TEST-63 renames, and the new name shows on existing transactions (AC-46) 32ms
+     → expected 404 to be 200 // Object.is equality
+   × Archive and restore > TEST-64 an archived account keeps its balance and summary, but new use is refused (AC-47, BR-16) 36ms
+     → expected 404 to be 200 // Object.is equality
+   × DELETE /api/accounts/:id > TEST-65 deletes an unused account (AC-48) 3ms
+     → Cannot read properties of undefined (reading 'id')
+   × DELETE /api/accounts/:id > TEST-65 refuses to delete an account used as header or line (AC-48, BR-17) 14ms
+     → expected 404 to be 422 // Object.is equality
+   × Type change > TEST-66 allows a type change only while unused and without opening balance (AC-49, BR-17) 3ms
+     → Cannot read properties of undefined (reading 'id')
+   × TEST-60 account name, type and subtype rules (AC-44, F-09 §3 steps 2-4) > accepts a valid Cash/Bank account and trims the name 8ms
+     → expected { ok: false, fields: {} } to deeply equal { ok: true, value: { …(3) } }
+   × TEST-60 account name, type and subtype rules (AC-44, F-09 §3 steps 2-4) > rejects a blank or 61-character name and accepts 60 characters 1ms
+     → expected [] to deeply equal [ 'name' ]
+   × TEST-60 account name, type and subtype rules (AC-44, F-09 §3 steps 2-4) > rejects an unknown type 1ms
+     → expected undefined to be defined
+   × TEST-60 account name, type and subtype rules (AC-44, F-09 §3 steps 2-4) > rejects CASH with subtype undefined 0ms
+     → expected undefined to be defined
+   × TEST-60 account name, type and subtype rules (AC-44, F-09 §3 steps 2-4) > rejects CASH with subtype null 0ms
+     → expected undefined to be defined
+   × TEST-60 account name, type and subtype rules (AC-44, F-09 §3 steps 2-4) > rejects CASH with subtype CREDIT_CARD 0ms
+     → expected undefined to be defined
+   × TEST-60 account name, type and subtype rules (AC-44, F-09 §3 steps 2-4) > rejects CASH with subtype PERSONAL 0ms
+     → expected undefined to be defined
+   × TEST-60 account name, type and subtype rules (AC-44, F-09 §3 steps 2-4) > rejects LOAN_TAKEN with subtype undefined 0ms
+     → expected undefined to be defined
+   × TEST-60 account name, type and subtype rules (AC-44, F-09 §3 steps 2-4) > rejects LOAN_TAKEN with subtype BANK 0ms
+     → expected undefined to be defined
+   × TEST-60 account name, type and subtype rules (AC-44, F-09 §3 steps 2-4) > rejects LOAN_GIVEN with subtype CREDIT_CARD 0ms
+     → expected undefined to be defined
+   × TEST-60 account name, type and subtype rules (AC-44, F-09 §3 steps 2-4) > rejects LOAN_GIVEN with subtype WALLET 0ms
+     → expected undefined to be defined
+   × TEST-60 account name, type and subtype rules (AC-44, F-09 §3 steps 2-4) > rejects INCOME with subtype BANK 0ms
+     → expected undefined to be defined
+   × TEST-60 account name, type and subtype rules (AC-44, F-09 §3 steps 2-4) > rejects EXPENSE with subtype OTHER 2ms
+     → expected undefined to be defined
+   × TEST-60 account name, type and subtype rules (AC-44, F-09 §3 steps 2-4) > accepts CASH with subtype WALLET (stored as WALLET) 1ms
+     → expected { ok: false, fields: {} } to deeply equal { ok: true, …(1) }
+   × TEST-60 account name, type and subtype rules (AC-44, F-09 §3 steps 2-4) > accepts CASH with subtype BANK (stored as BANK) 1ms
+     → expected { ok: false, fields: {} } to deeply equal { ok: true, …(1) }
+   × TEST-60 account name, type and subtype rules (AC-44, F-09 §3 steps 2-4) > accepts LOAN_TAKEN with subtype CREDIT_CARD (stored as CREDIT_CARD) 1ms
+     → expected { ok: false, fields: {} } to deeply equal { ok: true, …(1) }
+   × TEST-60 account name, type and subtype rules (AC-44, F-09 §3 steps 2-4) > accepts LOAN_TAKEN with subtype PERSONAL (stored as PERSONAL) 1ms
+     → expected { ok: false, fields: {} } to deeply equal { ok: true, …(1) }
+   × TEST-60 account name, type and subtype rules (AC-44, F-09 §3 steps 2-4) > accepts LOAN_TAKEN with subtype OTHER (stored as OTHER) 0ms
+     → expected { ok: false, fields: {} } to deeply equal { ok: true, …(1) }
+   × TEST-60 account name, type and subtype rules (AC-44, F-09 §3 steps 2-4) > accepts LOAN_GIVEN with subtype undefined (stored as PERSONAL) 0ms
+     → expected { ok: false, fields: {} } to deeply equal { ok: true, …(1) }
+   × TEST-60 account name, type and subtype rules (AC-44, F-09 §3 steps 2-4) > accepts LOAN_GIVEN with subtype OTHER (stored as OTHER) 1ms
+     → expected { ok: false, fields: {} } to deeply equal { ok: true, …(1) }
+   × TEST-60 account name, type and subtype rules (AC-44, F-09 §3 steps 2-4) > accepts INCOME with subtype undefined (stored as null) 1ms
+     → expected { ok: false, fields: {} } to deeply equal { ok: true, …(1) }
+   × TEST-60 account name, type and subtype rules (AC-44, F-09 §3 steps 2-4) > accepts EXPENSE with subtype null (stored as null) 0ms
+     → expected { ok: false, fields: {} } to deeply equal { ok: true, …(1) }
+   × TEST-60 PATCH body rules (F-09 §3 step 5) > isActive must be a boolean 0ms
+     → expected undefined to be defined
+   × TEST-60 PATCH body rules (F-09 §3 step 5) > accepts rename, archive and type change 0ms
+     → expected { ok: false, fields: {} } to deeply equal { ok: true, …(1) }
+   × TEST-61 names compare trimmed and case-insensitive (AC-45) > treats different case and spaces as the same name 1ms
+     → expected false to be true // Object.is equality
+ Test Files  2 failed (2)
+      Tests  34 failed | 5 passed (39)

@@ -1,0 +1,16 @@
+$ git rev-parse --short HEAD
+888d702
+$ cd server && npx vitest run tests/unit/account-rules.test.ts tests/api/account-management.api.test.ts tests/api/access.api.test.ts tests/api/accounts.api.test.ts   # after implementation
+ ✓ tests/api/account-management.api.test.ts (11 tests) 524ms
+ ✓ tests/api/accounts.api.test.ts (4 tests) 317ms
+ ✓ tests/api/access.api.test.ts (22 tests) 341ms
+ ✓ tests/unit/account-rules.test.ts (28 tests) 8ms
+ Test Files  4 passed (4)
+      Tests  65 passed (65)
+
+$ cd client && npx vitest run tests/Accounts.test.tsx tests/NewTransaction.test.tsx
+ ✓ tests/Accounts.test.tsx (4 tests) 418ms
+ ✓ tests/NewTransaction.test.tsx (2 tests) 495ms
+   ✓ TEST-37 transaction form (AC-31) > updates Remaining live, enables Save only at zero, and keeps values on a server rule error 474ms
+ Test Files  2 passed (2)
+      Tests  6 passed (6)
