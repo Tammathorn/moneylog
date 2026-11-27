@@ -1,6 +1,6 @@
 # Issue #60 / ISSUE-PARTNER-01 - RED (Playwright, defective code)
 # Branch: fix/60-long-description  Base commit: 047eaad (= staging; app code unchanged, only e2e/long-description.spec.ts added)
-# Date: 2026-11-27 20:59 ICT  Playwright 1.63.0  Chromium headless shell, project desktop-chromium
+# Date: 2026-11-28 03:59 ICT  Playwright 1.63.0  Chromium headless shell, project desktop-chromium
 # Command: npx playwright test e2e/long-description.spec.ts
 # Tests: TEST-101 (bob; 200 chars no spaces + 100-char unbroken line note), TEST-102 (alice; 200 chars with spaces); widths 1280 and 390 px
 # Assertion: document.documentElement.scrollWidth <= clientWidth on Transaction saved, History, /transactions/:id
