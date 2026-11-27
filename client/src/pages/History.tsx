@@ -100,6 +100,7 @@ export function History() {
         : <p className="empty">No transactions yet — record your first one.</p>)}
       {data && data.items.length > 0 && (
         <div className="card">
+          <div className="table-scroll">
           <table aria-label="Transactions">
             <thead><tr><th aria-label="Favourite" /><th>Date</th><th>Type</th><th>Account</th><th>Description</th><th className="num">Total</th></tr></thead>
             <tbody>
@@ -109,12 +110,13 @@ export function History() {
                   <td><Link to={`/transactions/${t.id}`}>{t.date}</Link></td>
                   <td>{KIND[t.kind]}</td>
                   <td>{t.account.name}</td>
-                  <td>{t.description ?? <span className="muted">{t.lines.map((l) => l.account.name).join(", ")}</span>}</td>
+                  <td className="long-text">{t.description ?? <span className="muted">{t.lines.map((l) => l.account.name).join(", ")}</span>}</td>
                   <td className="num"><Money satang={t.totalSatang} /></td>
                 </tr>
               ))}
             </tbody>
           </table>
+          </div>
           <div className="pager">
             <span className="muted small">Showing {offset + 1}–{offset + data.items.length} of {data.total}</span>
             <button type="button" disabled={offset === 0} onClick={() => goTo(Math.max(offset - PAGE, 0))}>Previous</button>
@@ -185,11 +187,11 @@ export function TransactionDetail() {
             <dt>Date</dt><dd>{tx.date}</dd>
             <dt>Total</dt><dd><Money satang={tx.totalSatang} /></dd>
             <dt>{tx.kind === "PAYMENT" ? "Paid from" : "Received into"}</dt><dd>{tx.account.name}</dd>
-            <dt>Description</dt><dd>{tx.description ?? "—"}</dd>
+            <dt>Description</dt><dd className="long-text">{tx.description ?? "—"}</dd>
           </dl>
           <table aria-label="Lines">
             <thead><tr><th>Account</th><th>Note</th><th className="num">Amount</th></tr></thead>
-            <tbody>{tx.lines.map((l) => <tr key={l.id}><td>{l.account.name}</td><td>{l.note ?? ""}</td><td className="num"><Money satang={l.amountSatang} /></td></tr>)}</tbody>
+            <tbody>{tx.lines.map((l) => <tr key={l.id}><td>{l.account.name}</td><td className="long-text">{l.note ?? ""}</td><td className="num"><Money satang={l.amountSatang} /></td></tr>)}</tbody>
           </table>
           {tx.updatedAt && <p className="muted small">Edited {new Date(tx.updatedAt).toLocaleString("en-GB", { timeZone: "Asia/Bangkok" })}</p>}
           <p className="row actions-row">
