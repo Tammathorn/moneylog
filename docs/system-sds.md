@@ -40,7 +40,7 @@ The API talks to PostgreSQL through Prisma's connection pool. Request flow for a
 |---|---|---|
 | `User` | id, email, displayName, role (`USER`/`ADMIN`), passwordHash, isActive, createdAt | email unique (lower-cased). passwordHash never leaves the server. |
 | `Session` | id, tokenHash, userId, createdAt, expiresAt | tokenHash unique (SHA-256 of cookie token). FK → User, cascade delete. |
-| `Account` | id, userId, name, type, subtype, openingBalanceSatang, openingDate, isActive, createdAt | FK → User (**owner**). unique(userId, name). CHECK openingBalanceSatang ≥ 0. type ∈ CASH, LOAN_GIVEN, LOAN_TAKEN, INCOME, EXPENSE; subtype ∈ WALLET, BANK, CREDIT_CARD, PERSONAL, OTHER or null. |
+| `Account` | id, userId, name, type, subtype, openingBalanceSatang, openingDate, isActive, createdAt | FK → User (**owner**). unique(userId, name). CHECK openingBalanceSatang between −1,000,000,000 and 1,000,000,000, and ≥ 0 unless type = CASH (v2.1, BR-09 rev. 3.0; v2.0: ≥ 0). type ∈ CASH, LOAN_GIVEN, LOAN_TAKEN, INCOME, EXPENSE; subtype ∈ WALLET, BANK, CREDIT_CARD, PERSONAL, OTHER or null. |
 | `MoneyTransaction` | id, userId, kind, accountId, date, totalSatang, description, isFavourite, createdAt, updatedAt (2.0) | FK → User (**owner**), FK → Account (paying/receiving). kind ∈ PAYMENT, RECEIPT. CHECK totalSatang > 0. index(userId, date desc). |
 | `TransactionLine` | id, transactionId, accountId, amountSatang, note | FK → MoneyTransaction (cascade), FK → Account. CHECK amountSatang > 0. unique(transactionId, accountId) (BR-05). |
 
@@ -196,3 +196,4 @@ restart or redeploy loses nothing.
 | §5 | Permissions for the new endpoints; all USER-only except change password | F-09 – F-13, F-16; TEST-92 |
 | §6 | Proxy-aware Origin check; change password | Lab 5 finding CR-02; FR-22 |
 | §7 | Delivery implemented; new variables | Lab 5 (F-14) |
+| §2 (v2.1) | Account opening-balance CHECK becomes type-aware (Cash may be negative) via a new migration | Lab 7 CR-L7-01 (#64), BR-09 rev. 3.0 |

@@ -8,7 +8,7 @@ the full requirement → feature → sprint → verification table is `docs/trac
 | F-01 | Sign-in, sign-out, current user | E-mail/password sign-in, server session cookie, sign-out, `GET /api/auth/me`, role-based home screen | FR-01, FR-02, FR-03, BR-23, BR-24, NFR-02, NFR-03 | — | 1 | Accepted v0.1.0; regression pass |
 | F-02 | Access-control foundation *(system responsibility)* | Shared middleware: authentication, role check, owner-scoped queries, safe error shape; applied to every protected route | BR-20, BR-21, NFR-01, NFR-06 | F-01 | 1 | Accepted v0.1.0; extended to Sprint 2 routes (TEST-92) |
 | F-03 | Accounts and balances | List own accounts grouped by type with derived balances; balance engine | FR-04, FR-08, BR-07, BR-13, BR-14, NFR-04 | F-01, F-02 | 1 | Accepted v0.1.0; `inUse` added (F-09) |
-| F-04 | Opening balance | Set opening balance and date on Cash / Loan accounts | FR-05, BR-06, BR-09 | F-03 | 1 | Accepted v0.1.0; archived → 422 (F-09) |
+| F-04 | Opening balance | Set opening balance and date on Cash / Loan accounts | FR-05, BR-06, BR-09 | F-03 | 1 | Accepted v0.1.0; archived → 422 (F-09); BR-09 rev. 3.0 negative Cash opening (Lab 7, #64) |
 | F-05 | Record transaction | Payment/charge and Money-received forms with allocation lines, server validation, atomic save | FR-06, FR-07, FR-08, BR-01–BR-07, BR-10–BR-12, NFR-05 | F-03 | 1 | Accepted v0.1.0; archived → 422 (F-09) |
 | F-06 | Transaction history and detail | Newest-first list and detail of own transactions | FR-09, BR-15 | F-05 | 1 | Accepted v0.1.0; extended by F-11 |
 | F-07 | Financial summary | Cash total, bank/wallet balances, card and other debt, loans given, income, expenses, net, category spending, optional date range | FR-10, BR-08 | F-03, F-05 | 1 | Accepted v0.1.0 |

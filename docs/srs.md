@@ -5,7 +5,7 @@
 | Product | MoneyLog — Personal Money and Expense Logging System |
 | Theme | 7. Personal Money and Expense Logging System (CPE 334 Group Work Specification §6) |
 | Team | Tammathorn Kananurak (67070503489, @Tammathorn) · Chakriwat Srivilai (67070503407, @GusGusxz) |
-| Version | 2.0 — Sprint 2 complete, Sprint 3 in progress (see §9 for history and approved revisions) |
+| Version | 3.0 — Sprint 2 complete, Sprint 3 in progress; Lab 7 maintenance revision of BR-09 (see §9 for history and approved revisions) |
 
 ## 1. Stakeholder problem and context
 
@@ -98,7 +98,7 @@ Money is THB with two decimals, stored as integer **satang** (1 THB = 100 satang
 | BR-06 | Every account referenced by a transaction or opening balance must belong to the signed-in user and be active. An account of another user is treated exactly like a non-existent one. *Rev. 2.0: an own archived account is refused with `ACCOUNT_ARCHIVED`; when correcting a transaction, archived accounts already on it may stay (D-12).* | 1 |
 | BR-07 | Balance effects (amount *a*). **Payment** from Cash: paying −*a*; from Loan Taken: paying +*a* (debt grows). Payment lines: Expense +*a*, Loan Taken −*a* (repaid), Loan Given +*a* (lent), Cash +*a* (transfer in). **Receipt** into Cash: receiving +*a*. Receipt lines: Income +*a*, Loan Given −*a* (repaid to user), Loan Taken +*a* (borrowed), Cash −*a* (transfer out). Balance = opening balance + Σ effects. | 1 |
 | BR-08 | Only lines to Income accounts count as income and only lines to Expense accounts count as expenses. Transfers, borrowing, loan repayments, lending and opening balances are never income or expenses. | 1 |
-| BR-09 | Opening balances apply only to Cash, Loan Given and Loan Taken accounts, are ≥ 0.00 and ≤ 10,000,000.00 THB, and have an opening date. Setting it again replaces the previous value. | 1 |
+| BR-09 | Opening balances apply only to Cash, Loan Given and Loan Taken accounts, are ≥ 0.00 and ≤ 10,000,000.00 THB, and have an opening date. Setting it again replaces the previous value. *Rev. 3.0 (Lab 7, CR-L7-01, #64): a **Cash** opening balance is from −10,000,000.00 to 10,000,000.00 THB (negative = started overdrawn); Loan Given / Loan Taken stay 0.00 to 10,000,000.00 THB (D-18).* | 1 |
 | BR-10 | A transaction date is a calendar date (YYYY-MM-DD) from 2000-01-01 up to today in Asia/Bangkok; future dates are rejected. | 1 |
 | BR-11 | Description is optional, trimmed, ≤ 200 characters. Line note is optional, ≤ 100 characters. | 1 |
 | BR-12 | A transaction and all its lines are saved atomically: either all rows exist or none. | 1 |
@@ -154,7 +154,7 @@ Money is THB with two decimals, stored as integer **satang** (1 THB = 100 satang
 | D-06 | Is a credit-card purchase an expense on the card? | Yes: Payment from the Loan Taken (card) account with Expense lines — debt rises, expense recorded. Repaying the card is a Payment from the bank with a Loan Taken line — not an expense (BR-08). | 2026-11-14 |
 | D-07 | What does an Administrator see for a user? | Name, e-mail, role, enabled flag, created date. Never counts or totals of financial data (BR-20). Financial routes refuse the ADMIN role with 403. | 2026-11-14 |
 | D-08 | Session or JWT? | Server-side session rows with an opaque cookie token (NFR-03). Sign-out and disable take effect immediately (BR-23), which a stateless JWT cannot do without a deny-list. Same design proven in TokTickIT. | 2026-11-14 |
-| D-09 | Can opening balance be negative? | No (BR-09). A Cash overdraft is rare for the users; Loan balances are "amount owed", always ≥ 0. Revisit in Sprint 2 if UAT disagrees. | 2026-11-14 |
+| D-09 | Can opening balance be negative? | No (BR-09). A Cash overdraft is rare for the users; Loan balances are "amount owed", always ≥ 0. Revisit in Sprint 2 if UAT disagrees. *Superseded for Cash by D-18 (rev. 3.0); unchanged for loans.* | 2026-11-14 |
 | D-10 | Is the opening date enforced against transaction dates? | Not in Sprint 1: the opening balance is the account's starting point regardless of date. Sprint 2 (FR-14 work) decides whether earlier transactions should warn. Recorded as open question Q-01. | 2026-11-14 |
 | D-11 | Another user's account id in a request? | Treated as non-existent: 422 `ACCOUNT_NOT_FOUND` for body references, 404 for path ids (BR-06). This does not reveal that the id exists. | 2026-11-14 |
 
@@ -164,6 +164,7 @@ Money is THB with two decimals, stored as integer **satang** (1 THB = 100 satang
 | D-15 | Delete or soft-delete a transaction? | Hard delete of header and lines after an explicit confirmation; balances are derived, so nothing else needs updating (D-02). A history of edits is out of scope. | 2026-11-25 |
 | D-16 | Q-01: a transaction dated before the opening date? | Allowed without warning: the opening balance is the starting point the user chose, and loans/cards are often entered after the fact. Revisit only if UAT reports confusion. | 2026-11-26 |
 | D-17 | Who may change a password, and what happens to other sessions? | Each user changes only their own (no user id in the request); other sessions end at once, the current one stays (FR-22, BR-23 spirit). | 2026-11-26 |
+| D-18 | Lab 7 (CR-L7-01, #64): may a Cash opening balance be negative? | Yes, from −10,000,000.00 to 10,000,000.00 THB. A user who starts with an overdrawn bank or e-wallet account must be able to record the true starting point; Cash balances may already go below zero (BR-14, D-05). Loan balances are "amount owed" and stay ≥ 0. Enforced in the API by account type and in the database by a type-aware CHECK (new migration). | 2026-11-28 |
 
 **Open questions:** none (Q-01 resolved by D-16).
 
@@ -172,4 +173,5 @@ Money is THB with two decimals, stored as integer **satang** (1 THB = 100 satang
 | Version | Date | Change |
 |---|---|---|
 | 1.0 | 2026-11-14 | Sprint 1 baseline. |
+| 3.0 | 2026-11-28 | Lab 7 maintenance change CR-L7-01 (#64): BR-09 allows a negative Cash opening balance down to −10,000,000.00 THB; loans unchanged; D-09 superseded for Cash by D-18. Reviewed by the teammate on the contract PR before implementation. |
 | 2.0 | 2026-11-26 | Sprint 2 revision (approved by both students in PR review): FR-13 subtype rule explicit; BR-06 archived-account code and edit exception; BR-17 lock includes opening balance; decisions D-12–D-17; Q-01 resolved; AS-03 closed. No requirement removed or moved between sprints. |

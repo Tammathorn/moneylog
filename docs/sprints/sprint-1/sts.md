@@ -68,6 +68,13 @@ T27,T50 · AC-25 T28,T29,T51 · AC-26 T30,T31 · AC-27 T32 · AC-28 T33,T34 · A
 AC-31 T37,T51 · AC-32 T38 · AC-33 T39 · AC-34 T40 · AC-35 T41,T42,T50 · AC-36 T43 · AC-37 T44 ·
 AC-38 T45 · AC-39 T46 · AC-40 T47 · AC-41 T48 · AC-42 T49. No AC is unmapped.
 
+| TEST-103 | AC-90, BR-09 rev. 3.0 | A | A's own Cash account with one Payment of 500 satang | PUT opening −1,000,000,000 @ 2026-11-01; then PUT −1 | 200 each; stored −1,000,000,000 then −1; `balanceSatang` = opening − 500 | accounts.api.test.ts |
+| TEST-104 | AC-91, AC-19 rev. 2 | A | A's Cash, Loan Given, Loan Taken accounts with opening 1,000 | PUT −1,000,000,001 on Cash; PUT −1 on Loan Given and on Loan Taken | 400 VALIDATION_FAILED, `fields.openingBalanceSatang`; stored values stay 1,000 | accounts.api.test.ts |
+| TEST-105 | AC-90, AC-91 (UI) | C | Accounts page, one Cash and one Loan Taken account | Type "-10,000,000.00" in the Cash opening form and submit; type "-1.00" in the Loan form | Cash: PUT body `openingBalanceSatang` −1,000,000,000; Loan: client error shown, no request sent | client/tests/Accounts.test.tsx |
+| TEST-106 | BR-09 rev. 3.0, BR-13 (data) | A | Migrated test DB | Direct Prisma update: Cash −1,000,000,000; Loan Taken −1; Cash −1,000,000,001 | Cash −1,000,000,000 stored; the other two rejected by the CHECK constraint | accounts.api.test.ts |
+
+*Lab 7 rows (STS v2.0, CR-L7-01, #64).* **TEST-22 rev. 2 (changed old expected result):** TEST-22 sends its invalid bodies to `Wallet`, a **Cash** account. Under BR-09 rev. 3.0 the old "−1" case is now valid for Cash (it is exactly AC-90/TEST-103), so in the test commit that one case changes from −1 to −1,000,000,001 (still invalid for Cash, AC-91). The other four invalid cases, the Income/Expense 422 check and the "value unchanged" assertion stay as they are. "Loan −1 is refused" is kept by TEST-104. (v2.0 of this note wrongly said TEST-22 used an Expense account; corrected in v2.1 before implementation.)
+
 **TDD targets** (test committed failing before implementation): TEST-28/30/32
 (`transaction-rules`), TEST-17/19 (`balances`), TEST-41 (`summary`).
 
@@ -76,3 +83,6 @@ AC-38 T45 · AC-39 T46 · AC-40 T47 · AC-41 T48 · AC-42 T49. No AC is unmapped
 | Version | Date | Change |
 |---|---|---|
 | 1.0 | 2026-11-14 | Planned tests, before implementation. |
+| 2.0 | 2026-11-28 | Lab 7 CR-L7-01 (#64): TEST-103 – TEST-106 added before implementation. RED targets: TEST-103, TEST-105, TEST-106 must fail on the pre-change code `910b662` because the new rule is missing; TEST-104 must pass before and after (guards the unchanged lower bounds). |
+| 2.1 | 2026-11-28 | Before implementation: TEST-22 rev. 2 — its Cash −1 case becomes −1,000,000,001 (found by the local pre-check: the old case contradicts AC-90). |
+| 2.2 | 2026-11-28 | Before implementation, teammate review on PR #65: Lab 7 tests renumbered TEST-101 – TEST-104 → TEST-103 – TEST-106, because TEST-101/102 are already used by the Lab 6 E2E tests (`e2e/long-description.spec.ts`). Content unchanged. |
