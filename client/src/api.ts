@@ -5,10 +5,12 @@ export type AccountType = "CASH" | "LOAN_GIVEN" | "LOAN_TAKEN" | "INCOME" | "EXP
 export interface Account {
   id: number; name: string; type: AccountType; subtype: string | null;
   openingBalanceSatang: number; openingDate: string | null; balanceSatang: number; isActive: boolean;
+  inUse?: boolean;
 }
 export interface AccountRef { id: number; name: string; type: AccountType }
 export interface Transaction {
   id: number; kind: "PAYMENT" | "RECEIPT"; date: string; totalSatang: number; description: string | null; createdAt: string;
+  updatedAt?: string | null; isFavourite?: boolean;
   account: AccountRef; lines: { id: number; amountSatang: number; note: string | null; account: AccountRef }[];
 }
 export interface Summary {

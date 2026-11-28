@@ -87,6 +87,7 @@ model MoneyTransaction {
   description String?
   isFavourite Boolean           @default(false)
   createdAt   DateTime          @default(now())
+  updatedAt    DateTime? // F-10: time of the last edit (null = never edited)
   lines       TransactionLine[]
 
   @@index([userId, date])

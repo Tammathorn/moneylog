@@ -1,7 +1,8 @@
 import { Router } from "express";
 import { getPrisma } from "../prisma.js";
 import { handle, sendError, sendValidation } from "../lib/http-error.js";
-import { verifyPassword } from "../lib/password.js";
+import { hashPassword, verifyPassword } from "../lib/password.js";
+import { checkNewPassword } from "../domain/password-policy.js";
 import { clearedSessionCookie, createSession, sessionCookie } from "../lib/session.js";
 import { authOf, requireAuth } from "../middleware/auth.js";
 import { userIdentity } from "../lib/dto.js";
@@ -37,3 +38,21 @@ authRouter.post("/logout", requireAuth, handle(async (_req, res) => {
 authRouter.get("/me", requireAuth, (_req, res) => {
   res.json({ user: userIdentity(authOf(res).user) });
 });
+
+// F-16 FR-22 - AC-76..AC-79: own password only (no user id in the request); other sessions are ended.
+authRouter.put("/password", requireAuth, handle(async (req, res) => {
+  const { currentPassword, newPassword } = req.body ?? {};
+  const checked = checkNewPassword(currentPassword, newPassword);
+  if (!checked.ok) return sendValidation(res, checked.fields);
+  const { user, sessionId } = authOf(res);
+  const prisma = getPrisma();
+  const fresh = await prisma.user.findUniqueOrThrow({ where: { id: user.id } });
+  if (!verifyPassword(fresh.passwordHash, currentPassword)) {
+    return sendValidation(res, { currentPassword: "The current password is not correct." });
+  }
+  await prisma.$transaction([
+    prisma.user.update({ where: { id: user.id }, data: { passwordHash: hashPassword(checked.value) } }),
+    prisma.session.deleteMany({ where: { userId: user.id, id: { not: sessionId } } }),
+  ]);
+  res.json({ ok: true });
+}));

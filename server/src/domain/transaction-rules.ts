@@ -44,3 +44,32 @@ export function validateTransactionRules(input: TransactionInput, accounts: Map<
   }
   return null;
 }
+
+export interface OwnAccount extends RuleAccount { name: string; isActive: boolean }
+
+// F-09 (AC-47, BR-16): an own archived account cannot be used in a new transaction.
+// `keep` lists archived ids that are allowed anyway (F-10: already on the transaction being edited).
+// Runs before validateTransactionRules, which only sees the usable accounts.
+export function archivedAccountUse(input: TransactionInput, own: OwnAccount[], keep: ReadonlySet<number> = new Set()): RuleError | null {
+  const byId = new Map(own.map((a) => [a.id, a]));
+  for (const id of [input.accountId, ...input.lines.map((l) => l.accountId)]) {
+    const a = byId.get(id);
+    if (a && !a.isActive && !keep.has(id)) {
+      return { code: "ACCOUNT_ARCHIVED", message: `${a.name} is archived. Restore it or choose another account.` };
+    }
+  }
+  return null;
+}
+
+// The accounts a transaction may use: active ones plus the `keep` archived ones.
+export function usableAccounts(own: OwnAccount[], keep: ReadonlySet<number> = new Set()): Map<number, RuleAccount> {
+  return new Map(own.filter((a) => a.isActive || keep.has(a.id)).map((a) => [a.id, { id: a.id, type: a.type }]));
+}
+
+// F-10 (AC-53): an edit may use the active accounts plus archived accounts already on the saved transaction,
+// so an old record can still be corrected after its account was archived.
+export function editableAccounts(own: OwnAccount[], saved: { accountId: number; lines: { accountId: number }[] }) {
+  const onSaved = new Set([saved.accountId, ...saved.lines.map((l) => l.accountId)]);
+  const keep: ReadonlySet<number> = new Set(own.filter((a) => !a.isActive && onSaved.has(a.id)).map((a) => a.id));
+  return { usable: usableAccounts(own, keep), keep };
+}

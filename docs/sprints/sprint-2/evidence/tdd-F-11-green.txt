@@ -1,0 +1,15 @@
+# F-11 green: commit d11dcad
+$ cd server && npx vitest run tests/unit/history-filter.test.ts tests/api/history-filter.api.test.ts tests/api/transactions.api.test.ts
+ ✓ tests/api/transactions.api.test.ts (11 tests) 596ms
+ ✓ tests/api/history-filter.api.test.ts (22 tests) 404ms
+ ✓ tests/unit/history-filter.test.ts (17 tests) 9ms
+ Test Files  3 passed (3)
+      Tests  50 passed (50)
+
+$ cd client && npx vitest run tests/History.test.tsx
+ ✓ tests/History.test.tsx (5 tests) 902ms
+   ✓ TEST-86 filter bar and pager (AC-62) > sends the filters, pages with Next/Previous, and clears 686ms
+ Test Files  1 passed (1)
+      Tests  5 passed (5)
+
+$ npx playwright test  ->  5 passed (run 4 times in a row)

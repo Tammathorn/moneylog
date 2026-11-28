@@ -27,7 +27,7 @@ describe("GET /api/accounts", () => {
     ]);
     expect(res.body.accounts[0]).toEqual({
       id: a.acc["KBank Savings"], name: "KBank Savings", type: "CASH", subtype: "BANK",
-      openingBalanceSatang: 0, openingDate: null, balanceSatang: 0, isActive: true,
+      openingBalanceSatang: 0, openingDate: null, balanceSatang: 0, isActive: true, inUse: false, // inUse added by F-09 (contract §5)
     });
   });
 });

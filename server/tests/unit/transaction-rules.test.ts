@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { validateTransactionRules, type RuleAccount } from "../../src/domain/transaction-rules.js";
+import { archivedAccountUse, editableAccounts, validateTransactionRules, type OwnAccount, type RuleAccount } from "../../src/domain/transaction-rules.js";
 import type { TransactionInput } from "../../src/domain/transaction-input.js";
 
 const accounts = new Map<number, RuleAccount>([
@@ -57,5 +57,33 @@ describe("ownership is resolved before rules (AC-29, BR-06)", () => {
   it("reports an account outside the caller's set as ACCOUNT_NOT_FOUND", () => {
     expect(validateTransactionRules(input({ accountId: 999 }), accounts)?.code).toBe("ACCOUNT_NOT_FOUND");
     expect(validateTransactionRules(input({ lines: [{ accountId: 999, amountSatang: 185000, note: null }] }), accounts)?.code).toBe("ACCOUNT_NOT_FOUND");
+  });
+});
+
+describe("TEST-68 accounts an edit may use (AC-53, F-10 §3 step 3)", () => {
+  const own: OwnAccount[] = [
+    { id: 1, type: "CASH", name: "KBank", isActive: true },
+    { id: 3, type: "LOAN_TAKEN", name: "KTC", isActive: true },
+    { id: 6, type: "EXPENSE", name: "Dining", isActive: false },
+    { id: 7, type: "EXPENSE", name: "Groceries", isActive: true },
+    { id: 8, type: "EXPENSE", name: "Electricity", isActive: false },
+  ];
+  const saved = { accountId: 3, lines: [{ accountId: 6 }, { accountId: 7 }] };
+
+  it("allows active accounts plus archived accounts already on the transaction", () => {
+    const { usable, keep } = editableAccounts(own, saved);
+    expect([...usable.keys()].sort()).toEqual([1, 3, 6, 7]);
+    expect([...keep]).toEqual([6]);
+  });
+
+  it("still refuses a different archived account", () => {
+    const { keep } = editableAccounts(own, saved);
+    const edit = input({ lines: [{ accountId: 6, amountSatang: 65000, note: null }, { accountId: 8, amountSatang: 120000, note: null }] });
+    expect(archivedAccountUse(edit, own, keep)).toEqual({ code: "ACCOUNT_ARCHIVED", message: "Electricity is archived. Restore it or choose another account." });
+    expect(archivedAccountUse(input({ lines: [{ accountId: 6, amountSatang: 185000, note: null }] }), own, keep)).toBeNull();
+  });
+
+  it("a new transaction keeps nothing archived", () => {
+    expect(archivedAccountUse(input({ lines: [{ accountId: 6, amountSatang: 185000, note: null }] }), own)?.code).toBe("ACCOUNT_ARCHIVED");
   });
 });

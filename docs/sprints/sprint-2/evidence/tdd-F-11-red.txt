@@ -1,0 +1,78 @@
+# F-11 red: commit 98ade28 (tests + stub)
+$ cd server && npx vitest run tests/unit/history-filter.test.ts tests/api/history-filter.api.test.ts
+   × TEST-82 each filter returns exactly the expected transactions (AC-58) > date range 26ms
+     → expected [ 311, 310, 309, 308, 307 ] to deeply equal [ 310, 309, 308 ]
+   × TEST-82 each filter returns exactly the expected transactions (AC-58) > account as header 9ms
+     → expected [ 311, 310, 309, 308, 307 ] to deeply equal [ 311, 310, 307 ]
+   × TEST-82 each filter returns exactly the expected transactions (AC-58) > account as line 8ms
+     → expected [ 311, 310, 309, 308, 307 ] to deeply equal [ 309, 308 ]
+   × TEST-82 each filter returns exactly the expected transactions (AC-58) > account as header or line 5ms
+     → expected [ 311, 310, 309, 308, 307 ] to deeply equal [ 310, 308 ]
+   × TEST-82 each filter returns exactly the expected transactions (AC-58) > kind 6ms
+     → expected [ 311, 310, 309, 308, 307 ] to deeply equal [ 307 ]
+   × TEST-82 each filter returns exactly the expected transactions (AC-58) > text in description, any case 5ms
+     → expected [ 311, 310, 309, 308, 307 ] to deeply equal [ 308 ]
+   × TEST-82 each filter returns exactly the expected transactions (AC-58) > text in a line note 5ms
+     → expected [ 311, 310, 309, 308, 307 ] to deeply equal [ 308 ]
+   × TEST-82 each filter returns exactly the expected transactions (AC-58) > amount range inclusive 5ms
+     → expected [ 311, 310, 309, 308, 307 ] to deeply equal [ 311, 310, 308 ]
+   × TEST-82 each filter returns exactly the expected transactions (AC-58) > two filters with AND 5ms
+     → expected [ 311, 310, 309, 308, 307 ] to deeply equal [ 308 ]
+   × TEST-83 invalid queries are refused with the field named (AC-59) > from=2026-02-30 5ms
+     → expected 200 to be 400 // Object.is equality
+   × TEST-83 invalid queries are refused with the field named (AC-59) > from=2026-11-30&to=2026-11-01 6ms
+     → expected 200 to be 400 // Object.is equality
+   × TEST-83 invalid queries are refused with the field named (AC-59) > minSatang=-1 7ms
+     → expected 200 to be 400 // Object.is equality
+   × TEST-83 invalid queries are refused with the field named (AC-59) > minSatang=1.5 5ms
+     → expected 200 to be 400 // Object.is equality
+   × TEST-83 invalid queries are refused with the field named (AC-59) > minSatang=500&maxSatang=100 4ms
+     → expected 200 to be 400 // Object.is equality
+   × TEST-83 invalid queries are refused with the field named (AC-59) > kind=OTHER 5ms
+     → expected 200 to be 400 // Object.is equality
+   × TEST-83 invalid queries are refused with the field named (AC-59) > accountId=abc 4ms
+     → expected 200 to be 400 // Object.is equality
+   × TEST-83 invalid queries are refused with the field named (AC-59) > favourite=yes 4ms
+     → expected 200 to be 400 // Object.is equality
+   × TEST-83 invalid queries are refused with the field named (AC-59) > q=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 4ms
+     → expected 200 to be 400 // Object.is equality
+   × TEST-84 filters never reach another user's data (AC-60, BR-21) > a query matching B's data returns only A's 6ms
+     → expected [ 311, 310, 309, 308, 307 ] to deeply equal [ 308 ]
+   × TEST-84 filters never reach another user's data (AC-60, BR-21) > B's account id matches nothing for A 5ms
+     → expected [ 311, 310, 309, 308, 307 ] to deeply equal []
+   × TEST-81 parseHistoryFilter (AC-59) > parses a full valid query into a typed filter 19ms
+     → expected { Object (ok, value) } to deeply equal { ok: true, value: { …(10) } }
+   × TEST-81 parseHistoryFilter (AC-59) > clamps limit and offset like Sprint 1 3ms
+     → expected { Object (ok, value) } to deeply equal { ok: true, …(1) }
+   × TEST-81 parseHistoryFilter (AC-59) > rejects {"from":"2026-02-30"} naming from 2ms
+     → expected true to be false // Object.is equality
+   × TEST-81 parseHistoryFilter (AC-59) > rejects {"to":"26-11-01"} naming to 1ms
+     → expected true to be false // Object.is equality
+   × TEST-81 parseHistoryFilter (AC-59) > rejects {"from":"2026-11-30","to":"2026-11-01"} naming from 1ms
+     → expected true to be false // Object.is equality
+   × TEST-81 parseHistoryFilter (AC-59) > rejects {"minSatang":"-1"} naming minSatang 1ms
+     → expected true to be false // Object.is equality
+   × TEST-81 parseHistoryFilter (AC-59) > rejects {"minSatang":"1.5"} naming minSatang 1ms
+     → expected true to be false // Object.is equality
+   × TEST-81 parseHistoryFilter (AC-59) > rejects {"maxSatang":"1000000001"} naming maxSatang 0ms
+     → expected true to be false // Object.is equality
+   × TEST-81 parseHistoryFilter (AC-59) > rejects {"minSatang":"500","maxSatang":"100"} naming minSatang 1ms
+     → expected true to be false // Object.is equality
+   × TEST-81 parseHistoryFilter (AC-59) > rejects {"kind":"OTHER"} naming kind 1ms
+     → expected true to be false // Object.is equality
+   × TEST-81 parseHistoryFilter (AC-59) > rejects {"accountId":"abc"} naming accountId 0ms
+     → expected true to be false // Object.is equality
+   × TEST-81 parseHistoryFilter (AC-59) > rejects {"accountId":"0"} naming accountId 3ms
+     → expected true to be false // Object.is equality
+   × TEST-81 parseHistoryFilter (AC-59) > rejects {"favourite":"yes"} naming favourite 0ms
+     → expected true to be false // Object.is equality
+   × TEST-81 parseHistoryFilter (AC-59) > rejects {"q":"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"} naming q 0ms
+     → expected true to be false // Object.is equality
+ Test Files  2 failed (2)
+      Tests  34 failed | 5 passed (39)
+
+$ cd client && npx vitest run tests/History.test.tsx
+   × TEST-86 filter bar and pager (AC-62) > sends the filters, pages with Next/Previous, and clears 83ms
+   × TEST-86 filter bar and pager (AC-62) > blocks Apply while Min is above Max 1004ms
+ Test Files  1 failed (1)
+      Tests  2 failed | 3 passed (5)

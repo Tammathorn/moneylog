@@ -1,0 +1,133 @@
+# Issue #60 / ISSUE-PARTNER-01 - RED (Playwright, defective code)
+# Branch: fix/60-long-description  Base commit: 047eaad (= staging; app code unchanged, only e2e/long-description.spec.ts added)
+# Date: 2026-11-28 03:59 ICT  Playwright 1.63.0  Chromium headless shell, project desktop-chromium
+# Command: npx playwright test e2e/long-description.spec.ts
+# Tests: TEST-101 (bob; 200 chars no spaces + 100-char unbroken line note), TEST-102 (alice; 200 chars with spaces); widths 1280 and 390 px
+# Assertion: document.documentElement.scrollWidth <= clientWidth on Transaction saved, History, /transactions/:id
+# Expected: FAIL
+
+
+Running 2 tests using 1 worker
+
+  ✘  1 [desktop-chromium] › e2e\long-description.spec.ts:72:5 › TEST-101 a 200-character description with no spaces does not overflow saved, History or detail (#60) (1.3s)
+  ✘  2 [desktop-chromium] › e2e\long-description.spec.ts:76:5 › TEST-102 a 200-character description with spaces does not overflow saved, History or detail (#60) (1.2s)
+
+
+  1) [desktop-chromium] › e2e\long-description.spec.ts:72:5 › TEST-101 a 200-character description with no spaces does not overflow saved, History or detail (#60) 
+
+    Error: History at 1280px: scrollWidth 2125 > clientWidth 1280
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 1280
+    Received:    2125
+
+      20 |       clientWidth: document.documentElement.clientWidth,
+      21 |     }));
+    > 22 |     expect.soft(scrollWidth, `${view} at ${width}px: scrollWidth ${scrollWidth} > clientWidth ${clientWidth}`).toBeLessThanOrEqual(clientWidth);
+         |                                                                                                                ^
+      23 |   }
+      24 |   await page.setViewportSize({ width: 1280, height: 860 });
+      25 | }
+        at expectNoHorizontalOverflow (C:\Users\User\Desktop\Lab5\moneylog\e2e\long-description.spec.ts:22:112)
+        at checkAllViews (C:\Users\User\Desktop\Lab5\moneylog\e2e\long-description.spec.ts:63:3)
+        at C:\Users\User\Desktop\Lab5\moneylog\e2e\long-description.spec.ts:73:3
+
+    Error: History at 390px: scrollWidth 2027 > clientWidth 390
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 390
+    Received:    2027
+
+      20 |       clientWidth: document.documentElement.clientWidth,
+      21 |     }));
+    > 22 |     expect.soft(scrollWidth, `${view} at ${width}px: scrollWidth ${scrollWidth} > clientWidth ${clientWidth}`).toBeLessThanOrEqual(clientWidth);
+         |                                                                                                                ^
+      23 |   }
+      24 |   await page.setViewportSize({ width: 1280, height: 860 });
+      25 | }
+        at expectNoHorizontalOverflow (C:\Users\User\Desktop\Lab5\moneylog\e2e\long-description.spec.ts:22:112)
+        at checkAllViews (C:\Users\User\Desktop\Lab5\moneylog\e2e\long-description.spec.ts:63:3)
+        at C:\Users\User\Desktop\Lab5\moneylog\e2e\long-description.spec.ts:73:3
+
+    Error: Detail at 1280px: scrollWidth 1893 > clientWidth 1280
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 1280
+    Received:    1893
+
+      20 |       clientWidth: document.documentElement.clientWidth,
+      21 |     }));
+    > 22 |     expect.soft(scrollWidth, `${view} at ${width}px: scrollWidth ${scrollWidth} > clientWidth ${clientWidth}`).toBeLessThanOrEqual(clientWidth);
+         |                                                                                                                ^
+      23 |   }
+      24 |   await page.setViewportSize({ width: 1280, height: 860 });
+      25 | }
+        at expectNoHorizontalOverflow (C:\Users\User\Desktop\Lab5\moneylog\e2e\long-description.spec.ts:22:112)
+        at checkAllViews (C:\Users\User\Desktop\Lab5\moneylog\e2e\long-description.spec.ts:69:3)
+        at C:\Users\User\Desktop\Lab5\moneylog\e2e\long-description.spec.ts:73:3
+
+    Error: Detail at 390px: scrollWidth 1795 > clientWidth 390
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 390
+    Received:    1795
+
+      20 |       clientWidth: document.documentElement.clientWidth,
+      21 |     }));
+    > 22 |     expect.soft(scrollWidth, `${view} at ${width}px: scrollWidth ${scrollWidth} > clientWidth ${clientWidth}`).toBeLessThanOrEqual(clientWidth);
+         |                                                                                                                ^
+      23 |   }
+      24 |   await page.setViewportSize({ width: 1280, height: 860 });
+      25 | }
+        at expectNoHorizontalOverflow (C:\Users\User\Desktop\Lab5\moneylog\e2e\long-description.spec.ts:22:112)
+        at checkAllViews (C:\Users\User\Desktop\Lab5\moneylog\e2e\long-description.spec.ts:69:3)
+        at C:\Users\User\Desktop\Lab5\moneylog\e2e\long-description.spec.ts:73:3
+
+    Error Context: test-results\long-description-TEST-101--2e142-saved-History-or-detail-60--desktop-chromium\error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\long-description-TEST-101--2e142-saved-History-or-detail-60--desktop-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\long-description-TEST-101--2e142-saved-History-or-detail-60--desktop-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [desktop-chromium] › e2e\long-description.spec.ts:76:5 › TEST-102 a 200-character description with spaces does not overflow saved, History or detail (#60) 
+
+    Error: History at 390px: scrollWidth 465 > clientWidth 390
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 390
+    Received:    465
+
+      20 |       clientWidth: document.documentElement.clientWidth,
+      21 |     }));
+    > 22 |     expect.soft(scrollWidth, `${view} at ${width}px: scrollWidth ${scrollWidth} > clientWidth ${clientWidth}`).toBeLessThanOrEqual(clientWidth);
+         |                                                                                                                ^
+      23 |   }
+      24 |   await page.setViewportSize({ width: 1280, height: 860 });
+      25 | }
+        at expectNoHorizontalOverflow (C:\Users\User\Desktop\Lab5\moneylog\e2e\long-description.spec.ts:22:112)
+        at checkAllViews (C:\Users\User\Desktop\Lab5\moneylog\e2e\long-description.spec.ts:63:3)
+        at C:\Users\User\Desktop\Lab5\moneylog\e2e\long-description.spec.ts:77:3
+
+    Error Context: test-results\long-description-TEST-102--109ce-saved-History-or-detail-60--desktop-chromium\error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\long-description-TEST-102--109ce-saved-History-or-detail-60--desktop-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\long-description-TEST-102--109ce-saved-History-or-detail-60--desktop-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2 failed
+    [desktop-chromium] › e2e\long-description.spec.ts:72:5 › TEST-101 a 200-character description with no spaces does not overflow saved, History or detail (#60) 
+    [desktop-chromium] › e2e\long-description.spec.ts:76:5 › TEST-102 a 200-character description with spaces does not overflow saved, History or detail (#60) 
+exit code: 1

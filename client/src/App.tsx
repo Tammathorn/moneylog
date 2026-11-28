@@ -6,6 +6,8 @@ import { Status } from "./components/Money";
 import { Login } from "./pages/Login";
 import { Overview } from "./pages/Overview";
 import { Accounts } from "./pages/Accounts";
+import { Loans } from "./pages/Loans";
+import { ChangePassword } from "./pages/ChangePassword";
 import { NewTransaction } from "./pages/NewTransaction";
 import { History, TransactionDetail } from "./pages/History";
 import { AdminUsers } from "./pages/AdminUsers";
@@ -28,6 +30,9 @@ export function App() {
         <Route path="/transactions" element={<For role="USER"><History /></For>} />
         <Route path="/transactions/new" element={<For role="USER"><NewTransaction /></For>} />
         <Route path="/transactions/:id" element={<For role="USER"><TransactionDetail /></For>} />
+        <Route path="/transactions/:id/edit" element={<For role="USER"><NewTransaction /></For>} />
+        <Route path="/loans" element={<For role="USER"><Loans /></For>} />
+        <Route path="/account/password" element={user ? <ChangePassword /> : <Navigate to="/login" replace />} />
         <Route path="/admin/users" element={<For role="ADMIN"><AdminUsers /></For>} />
         <Route path="*" element={<p>Page not found.</p>} />
       </Route>

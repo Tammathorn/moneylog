@@ -3,7 +3,7 @@
 # Usage: bash scripts/verify-release.sh   (needs PostgreSQL running and server/.env)
 set -uo pipefail
 cd "$(dirname "$0")/.."
-OUT=docs/sprints/sprint-1/evidence/release-run.txt
+OUT=${OUT:-docs/sprints/sprint-1/evidence/release-run.txt}
 {
   echo "Commit: $(git rev-parse HEAD)  ($(git log -1 --format=%cd --date=iso))"
   echo "Branch: $(git rev-parse --abbrev-ref HEAD)"

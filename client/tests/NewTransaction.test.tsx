@@ -43,3 +43,17 @@ describe("TEST-37 transaction form (AC-31)", () => {
     });
   });
 });
+
+describe("TEST-67 archived accounts are not offered for a new transaction (AC-50, BR-16)", () => {
+  it("leaves an archived account out of the header and line selects", async () => {
+    mockApi({
+      "GET /api/auth/me": { status: 200, body: { user: USER } },
+      "GET /api/accounts": { status: 200, body: { accounts: [...ACCOUNTS, { ...account(9, "Old Wallet", "CASH"), isActive: false }, { ...account(10, "Old Dining", "EXPENSE"), isActive: false }] } },
+    });
+    renderApp("/transactions/new");
+    const header = await screen.findByLabelText("Paid from *");
+    expect(header).toHaveTextContent("KBank Savings");
+    expect(header).not.toHaveTextContent("Old Wallet");
+    expect(screen.getByLabelText("Line 1 account")).not.toHaveTextContent("Old Dining");
+  });
+});

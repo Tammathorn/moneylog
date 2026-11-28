@@ -1,0 +1,12 @@
+# F-16 FR-22 green: commit 61f4195
+$ cd server && npx vitest run tests/unit/password-policy.test.ts tests/api/password.api.test.ts
+ ✓ tests/api/password.api.test.ts (3 tests) 674ms
+   ✓ PUT /api/auth/password > TEST-95 changes the password, keeps this session and ends the others (AC-76) 331ms
+ ✓ tests/unit/password-policy.test.ts (8 tests) 4ms
+ Test Files  2 passed (2)
+      Tests  11 passed (11)
+
+$ cd client && npx vitest run tests/ChangePassword.test.tsx
+ ✓ tests/ChangePassword.test.tsx (3 tests) 534ms
+ Test Files  1 passed (1)
+      Tests  3 passed (3)
