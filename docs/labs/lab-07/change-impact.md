@@ -1,6 +1,6 @@
 # Lab 7 — Change request CR-L7-01 and impact analysis
 
-Version 1.0 (2026-11-28), written **before implementation**. Issue: #64.
+Version 1.1 (2026-11-28), written **before implementation** (1.1: TEST-22 rev. 2 and mobile minus sign, found by a local pre-check before any code commit). Issue: #64.
 Change type: adaptive maintenance (the requirement changed; the Sprint 1 behaviour was correct for the old rule).
 
 ## 1. Versions
@@ -47,10 +47,12 @@ Change type: adaptive maintenance (the requirement changed; the Sprint 1 behavio
 | Preserved behaviour | Regression protection |
 |---|---|
 | Owner-only access; another user's account → 404; Administrator → 403 | TEST-23, `access.api.test.ts` (Admin denied on every financial route) |
-| Loan opening ≥ 0; Income/Expense refused; bad date refused | TEST-22, TEST-102 |
+| Loan opening ≥ 0; Income/Expense refused; bad date refused | TEST-22 rev. 2, TEST-102 |
 | Balance = opening + Σ effects, exact satang | TEST-17, TEST-19, `summary.api.test.ts` |
 | Transactions reject signs and non-positive amounts | TEST-18, transaction API tests |
 | Archived account refused (F-09) | `account-management.api.test.ts` |
+
+**Changed old expected result.** TEST-22 (AC-19) sent −1 to the Cash account `Wallet` and expected 400. The new rule makes that value valid for Cash, so that one case becomes −1,000,000,001 (still 400); every other TEST-22 case is kept, and the Loan −1 refusal is covered by TEST-102. No old test is deleted or skipped.
 
 Selected regression suite: full server suite (`npm test --prefix server`), client suite, E2E journey (TEST-50), run with `scripts/verify-release.sh` on the release commit.
 

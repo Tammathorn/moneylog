@@ -66,7 +66,8 @@ handled); error alert on failure; amounts right-aligned in `฿` format; negativ
 "(negative)". Opening form: amount + date inputs with labels, client checks format before
 sending, server `fields` shown under inputs, "Saving…" while busy. *Rev. 2.0:* on a Cash account
 the amount may start with a minus sign ("-1,500.00"); on a Loan account a minus sign is refused
-by the client check. `parseThb` itself is unchanged (transactions still reject signs, AC-16).
+by the client check. The Cash amount field must let a phone keyboard type the minus sign (no
+decimal-only keypad there). `parseThb` itself is unchanged (transactions still reject signs, AC-16).
 
 ## 7. Data
 
