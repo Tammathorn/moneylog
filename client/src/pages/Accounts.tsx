@@ -1,7 +1,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { api, ApiError, GENERIC, type Account, type AccountType } from "../api";
 import { ErrorAlert, Money, Status } from "../components/Money";
-import { parseThb, todayBangkok, TYPE_LABEL } from "../money";
+import { parseSignedThb, parseThb, todayBangkok, TYPE_LABEL } from "../money";
 
 const ORDER = ["CASH", "LOAN_TAKEN", "LOAN_GIVEN", "INCOME", "EXPENSE"] as const;
 // Mirrors F-09 §3 step 4 so the form only offers valid subtypes. The API re-checks.
@@ -185,7 +185,7 @@ function OpeningForm({ account, onSaved, onCancel }: { account: Account; onSaved
 
   async function submit(e: FormEvent) {
     e.preventDefault();
-    const satang = parseThb(amount);
+    const satang = account.type === "CASH" ? parseSignedThb(amount) : parseThb(amount);
     if (satang === null) return setError("Enter an amount like 1500 or 1500.50.");
     setBusy(true);
     setError(null);
@@ -200,7 +200,7 @@ function OpeningForm({ account, onSaved, onCancel }: { account: Account; onSaved
   }
   return (
     <form className="inline-form" onSubmit={submit}>
-      <label>Opening amount (THB) <input inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} aria-label="Opening amount" /></label>
+      <label>Opening amount (THB) <input inputMode={account.type === "CASH" ? "text" : "decimal"} value={amount} onChange={(e) => setAmount(e.target.value)} aria-label="Opening amount" /></label>
       <label>Opening date <input type="date" value={date} max={todayBangkok()} onChange={(e) => setDate(e.target.value)} aria-label="Opening date" /></label>
       <button type="submit" className="primary" disabled={busy}>{busy ? "Saving…" : "Save"}</button>
       <button type="button" className="link" onClick={onCancel}>Cancel</button>

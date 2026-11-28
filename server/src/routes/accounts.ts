@@ -4,7 +4,7 @@ import { getPrisma } from "../prisma.js";
 import { handle, parseId, sendError, sendNotFound, sendValidation } from "../lib/http-error.js";
 import { authOf, userOnly } from "../middleware/auth.js";
 import { ledgerAccountDto, loadLedger } from "../lib/ledger.js";
-import { isValidSatang } from "../domain/money.js";
+import { isValidSatang, MAX_SATANG } from "../domain/money.js";
 import { isAllowedDate, toDbDate } from "../domain/dates.js";
 import { parseAccountInput, parseAccountPatch, sameName } from "../domain/account-rules.js";
 
@@ -108,7 +108,11 @@ accountsRouter.put("/:id/opening-balance", handle(async (req, res) => {
 
   const { openingBalanceSatang, openingDate } = req.body ?? {};
   const fields: Record<string, string> = {};
-  if (!isValidSatang(openingBalanceSatang, 0)) fields.openingBalanceSatang = "Enter an amount from 0.00 to 10,000,000.00.";
+  // BR-09 rev. 3.0: only a Cash opening balance may be negative.
+  const isCash = account.type === "CASH";
+  if (!isValidSatang(openingBalanceSatang, isCash ? -MAX_SATANG : 0)) {
+    fields.openingBalanceSatang = `Enter an amount from ${isCash ? "-10,000,000.00" : "0.00"} to 10,000,000.00.`;
+  }
   if (!isAllowedDate(openingDate)) fields.openingDate = "Enter a real date from 2000-01-01 up to today.";
   if (Object.keys(fields).length) return sendValidation(res, fields);
   if (!account.isActive) {
