@@ -19,6 +19,32 @@ describe("TEST-20 accounts page (AC-17, BR-14)", () => {
   });
 });
 
+describe("TEST-105 signed opening balance form (AC-90, AC-91)", () => {
+  it("sends a negative Cash opening and refuses a minus sign on a Loan account", async () => {
+    const wallet = account(2, "Wallet", "CASH", 0);
+    const calls = mockApi({
+      "GET /api/auth/me": { status: 200, body: { user: USER } },
+      "GET /api/accounts": { status: 200, body: { accounts: [wallet, account(3, "KTC Credit Card", "LOAN_TAKEN", 0)] } },
+      "PUT /api/accounts/2/opening-balance": { status: 200, body: { account: {
+        ...wallet, openingBalanceSatang: -1_000_000_000, openingDate: "2026-11-01", balanceSatang: -1_000_000_000,
+      } } },
+    });
+    renderApp("/accounts");
+    await userEvent.click(await screen.findByRole("button", { name: "Set opening balance for Wallet" }));
+    await userEvent.type(screen.getByLabelText("Opening amount"), "-10,000,000.00");
+    await userEvent.click(screen.getByRole("button", { name: "Save" }));
+    await waitFor(() => expect(calls.find((c) => c.key === "PUT /api/accounts/2/opening-balance")?.body)
+      .toMatchObject({ openingBalanceSatang: -1_000_000_000 }));
+    expect(await screen.findByTestId("balance-Wallet")).toHaveTextContent("-฿10,000,000.00 (negative)");
+
+    await userEvent.click(screen.getByRole("button", { name: "Set opening balance for KTC Credit Card" }));
+    await userEvent.type(screen.getByLabelText("Opening amount"), "-1.00");
+    await userEvent.click(screen.getByRole("button", { name: "Save" }));
+    expect(await screen.findByRole("alert")).toHaveTextContent("Enter an amount like 1500 or 1500.50.");
+    expect(calls.filter((c) => c.key === "PUT /api/accounts/3/opening-balance")).toHaveLength(0);
+  });
+});
+
 describe("TEST-67 account management on the Accounts page (AC-50)", () => {
   const archived = { ...account(5, "Old Wallet", "CASH", 1_000), isActive: false };
 
