@@ -1,0 +1,220 @@
+# Issue #60 / ISSUE-PARTNER-01 - GREEN (CSS/markup fix) + regression (same steps as .github/workflows/ci-docker.yml)
+# Branch: fix/60-long-description  Base commit: 047eaad + uncommitted fix (client/src/styles.css, client/src/pages/History.tsx)
+# Date: 2026-11-28 03:59 ICT  Node v24.16.0  PostgreSQL 16 (docker postgres:16-alpine)  Playwright 1.63.0
+
+## 1. Regression test - npx playwright test e2e/long-description.spec.ts (expected: PASS)
+
+Running 2 tests using 1 worker
+
+  ✓  1 [desktop-chromium] › e2e\long-description.spec.ts:72:5 › TEST-101 a 200-character description with no spaces does not overflow saved, History or detail (#60) (1.6s)
+  ✓  2 [desktop-chromium] › e2e\long-description.spec.ts:76:5 › TEST-102 a 200-character description with spaces does not overflow saved, History or detail (#60) (1.2s)
+
+  2 passed (9.0s)
+exit code: 0
+
+## 2. Deploy scripts - syntax and offline tests
+bash -n: ok
+oidc dry run: ok
+PASS deploy.sh dry run
+PASS release.sh (deploy, rollback, tag validation)
+......
+----------------------------------------------------------------------
+Ran 6 tests in 0.008s
+
+OK
+PASS /api/health
+PASS /api/health
+PASS /api/ready
+PASS /
+PASS /api/version
+PASS /api/health
+PASS /api/ready
+PASS /
+PASS /api/health
+PASS /api/ready
+PASS /
+PASS /api/version
+PASS /api/accounts
+SKIP sign-in: optional smoke credentials not configured
+PASS /api/health
+PASS /api/ready
+PASS /
+PASS /api/version
+PASS /api/accounts
+PASS /api/health
+PASS /api/ready
+PASS /
+PASS /api/version
+PASS /api/accounts
+PASS sign-in and /api/accounts
+PASS sign-out
+exit code: 0
+
+## 3. Server - npx prisma migrate deploy && npm run build && npm test
+Prisma schema loaded from prisma\schema.prisma
+Datasource "db": PostgreSQL database "moneylog_test", schema "public" at "localhost:5432"
+
+2 migrations found in prisma/migrations
+
+
+No pending migrations to apply.
+
+> moneylog-server@0.1.0 build
+> prisma generate && tsc
+
+Prisma schema loaded from prisma\schema.prisma
+
+✔ Generated Prisma Client (v5.22.0) to .\node_modules\@prisma\client in 86ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Easily identify and fix slow SQL queries in your app. Optimize helps you enhance your visibility: https://pris.ly/--optimize
+
+
+> moneylog-server@0.1.0 test
+> vitest run
+
+
+ RUN  v2.1.9 C:/Users/User/Desktop/Lab5/moneylog/server
+
+ ✓ tests/api/account-management.api.test.ts (11 tests) 727ms
+ ✓ tests/api/transactions.api.test.ts (11 tests) 858ms
+ ✓ tests/api/transaction-correction.api.test.ts (6 tests) 753ms
+ ✓ tests/unit/transaction-rules.test.ts (14 tests) 23ms
+ ✓ tests/api/auth.api.test.ts (7 tests) 640ms
+ ✓ tests/api/history-filter.api.test.ts (22 tests) 712ms
+ ✓ tests/api/loans.api.test.ts (3 tests) 553ms
+ ✓ tests/api/accounts.api.test.ts (4 tests) 481ms
+ ✓ tests/api/access.api.test.ts (26 tests) 372ms
+ ✓ tests/unit/account-rules.test.ts (28 tests) 7ms
+ ✓ tests/unit/loans.test.ts (5 tests) 14ms
+ ✓ tests/unit/summary.test.ts (3 tests) 4ms
+ ✓ tests/api/password.api.test.ts (3 tests) 805ms
+   ✓ PUT /api/auth/password > TEST-95 changes the password, keeps this session and ends the others (AC-76) 390ms
+ ✓ tests/api/admin.api.test.ts (4 tests) 434ms
+ ✓ tests/unit/balances.test.ts (11 tests) 4ms
+ ✓ tests/api/favourites.api.test.ts (2 tests) 504ms
+ ✓ tests/api/summary.api.test.ts (3 tests) 494ms
+ ✓ tests/unit/transaction-input.test.ts (17 tests) 29ms
+ ✓ tests/unit/history-filter.test.ts (17 tests) 7ms
+ ✓ tests/api/ops.api.test.ts (3 tests) 283ms
+ ✓ tests/unit/password-policy.test.ts (8 tests) 3ms
+ ✓ tests/unit/http-error.test.ts (1 test) 4ms
+ ✓ tests/unit/session.test.ts (2 tests) 3ms
+ ✓ tests/unit/money.test.ts (3 tests) 20ms
+ ✓ tests/unit/password.test.ts (1 test) 257ms
+ ✓ tests/unit/seed-config.test.ts (1 test) 4ms
+
+ Test Files  26 passed (26)
+      Tests  216 passed (216)
+   Start at  03:59:56
+   Duration  20.98s (transform 348ms, setup 0ms, collect 4.65s, tests 8.00s, environment 5ms, prepare 2.47s)
+
+exit code: 0
+
+## 4. Client - npm test && npm run build
+
+> moneylog-client@0.1.0 test
+> vitest run
+
+
+ RUN  v2.1.9 C:/Users/User/Desktop/Lab5/moneylog/client
+
+stderr | tests/AdminUsers.test.tsx > TEST-49 users page (AC-42) > disables another user and shows the new status; no Disable on own row
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | tests/Footer.test.tsx > TEST-57 footer shows the running release (Lab 5 R-08) > shows the short commit from /api/version on the sign-in page and inside the app
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | tests/Login.test.tsx > TEST-10 sign-in form (AC-08) > shows the server's sign-in failure message and stays on the form
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | tests/Accounts.test.tsx > TEST-20 accounts page (AC-17, BR-14) > formats balances in baht and marks a negative cash balance
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | tests/ChangePassword.test.tsx > TEST-98 change password page (AC-80) > checks that the new passwords match before sending
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | tests/Loans.test.tsx > TEST-91 Loans page (AC-72) > shows both sections with totals, outstanding and history rows
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | tests/History.test.tsx > TEST-40 history (AC-34) > shows the empty state when there are no transactions
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | tests/NewTransaction.test.tsx > TEST-37 transaction form (AC-31) > updates Remaining live, enables Save only at zero, and keeps values on a server rule error
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ tests/Footer.test.tsx (2 tests) 152ms
+stderr | tests/TransactionDetail.test.tsx > TEST-77 edit and delete from the detail page (AC-57) > Edit opens the form pre-filled and Save changes sends a PUT
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ tests/Loans.test.tsx (2 tests) 263ms
+ ✓ tests/AdminUsers.test.tsx (1 test) 269ms
+ ✓ tests/Login.test.tsx (1 test) 701ms
+   ✓ TEST-10 sign-in form (AC-08) > shows the server's sign-in failure message and stays on the form 699ms
+ ✓ tests/Accounts.test.tsx (4 tests) 945ms
+   ✓ TEST-67 account management on the Accounts page (AC-50) > creates an account and shows it in its type group 510ms
+ ✓ tests/NewTransaction.test.tsx (2 tests) 1152ms
+   ✓ TEST-37 transaction form (AC-31) > updates Remaining live, enables Save only at zero, and keeps values on a server rule error 1110ms
+ ✓ tests/TransactionDetail.test.tsx (6 tests) 1186ms
+   ✓ TEST-77 edit and delete from the detail page (AC-57) > Edit opens the form pre-filled and Save changes sends a PUT 721ms
+ ✓ tests/History.test.tsx (5 tests) 1649ms
+   ✓ TEST-86 filter bar and pager (AC-62) > sends the filters, pages with Next/Previous, and clears 1144ms
+ ✓ tests/ChangePassword.test.tsx (3 tests) 2577ms
+   ✓ TEST-98 change password page (AC-80) > checks that the new passwords match before sending 1132ms
+   ✓ TEST-98 change password page (AC-80) > shows a server field error, then the success message 1429ms
+
+ Test Files  9 passed (9)
+      Tests  26 passed (26)
+   Start at  04:00:18
+   Duration  5.47s (transform 630ms, setup 4.25s, collect 3.74s, tests 8.89s, environment 13.03s, prepare 1.70s)
+
+
+> moneylog-client@0.1.0 build
+> tsc && vite build
+
+vite v6.4.6 building for production...
+transforming...
+✓ 45 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.41 kB │ gzip:  0.28 kB
+dist/assets/index-C5VdJ3S2.css    5.71 kB │ gzip:  1.82 kB
+dist/assets/index-BBjEqJaq.js   203.70 kB │ gzip: 64.29 kB
+✓ built in 983ms
+exit code: 0
+
+## 5. End-to-end - npx playwright test (full suite)
+
+Running 9 tests using 1 worker
+
+  ✓  1 [desktop-chromium] › e2e\access.spec.ts:5:5 › TEST-52 the administrator manages users but cannot reach financial data (1.1s)
+  ✓  2 [desktop-chromium] › e2e\access.spec.ts:21:5 › TEST-09 a disabled user cannot sign in (AC-02 via UI) (536ms)
+  ✓  3 [desktop-chromium] › e2e\journey.spec.ts:5:5 › TEST-50 alice logs a month of money and sees correct balances, summary and history (2.5s)
+  ✓  4 [desktop-chromium] › e2e\long-description.spec.ts:72:5 › TEST-101 a 200-character description with no spaces does not overflow saved, History or detail (#60) (1.2s)
+  ✓  5 [desktop-chromium] › e2e\long-description.spec.ts:76:5 › TEST-102 a 200-character description with spaces does not overflow saved, History or detail (#60) (1.2s)
+  ✓  6 [desktop-chromium] › e2e\rules.spec.ts:5:5 › TEST-51 a 1,850.00 total with lines of 650.00 + 1,199.99 cannot be saved (786ms)
+  ✓  7 [desktop-chromium] › e2e\sprint2-correction.spec.ts:11:5 › TEST-80 alice corrects a card purchase, duplicates it and deletes the duplicate (1.7s)
+  ✓  8 [desktop-chromium] › e2e\sprint3-demo.spec.ts:5:5 › TEST-99 bob creates an account, archives Wallet and the API refuses it in a new transaction (1.0s)
+  ✓  9 [desktop-chromium] › e2e\sprint3-demo.spec.ts:40:5 › TEST-100 bob changes his password; the new one works and the old one does not (1.0s)
+
+  9 passed (17.5s)
+exit code: 0
+
+## 6. Docker - docker build --build-arg GIT_SHA=local-issue60 -t moneylog:ci .
+#23 exporting manifest list sha256:1e84a39da0e4ee66ec90417dd45e6ed6d0b6c8c04eabb3a4b75dce9d78d67e9c
+#23 exporting manifest list sha256:1e84a39da0e4ee66ec90417dd45e6ed6d0b6c8c04eabb3a4b75dce9d78d67e9c 0.0s done
+#23 naming to docker.io/library/moneylog:ci done
+#23 unpacking to docker.io/library/moneylog:ci
+#23 unpacking to docker.io/library/moneylog:ci 3.7s done
+#23 DONE 7.9s
+exit code: 0
