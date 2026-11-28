@@ -1,0 +1,328 @@
+Lab 7 CR-L7-01 (#64) - GREEN: the same tests on the implementation commit
+Commit: 08ee1b14022a26abf4d732d2a7f3c662d633ceda  (2026-11-28 23:12:57 +0700)
+Subject: feat(lab7): BR-09 rev. 3.0 negative Cash opening balance (#64)
+Branch: lab7/cr-l7-01-impl
+Tracked files modified at start: none
+Run started: 2026-11-28 23:12:57 +0700
+Versions: Node v24.14.0, npm 11.9.0, vitest/2.1.9 win32-x64 node-v24.14.0 (server), postgres (PostgreSQL) 16.16
+Database: moneylog_test kept from the RED run (old schema); global-setup.ts applied this commit's new migration to it, then seeded
+Commands:
+  npm test --prefix server -- --reporter=verbose
+  DEBUG_PRINT_LIMIT=400 npm test --prefix client -- --reporter=verbose
+Server: Tests  219 passed (219)   (no 'skipped' entry = 0 skipped)
+Client: Tests  27 passed (27)   (no 'skipped' entry = 0 skipped)
+Local folder paths are replaced by <repo>; colour codes removed.
+
+== npm test --prefix server -- --reporter=verbose
+
+> moneylog-server@0.1.0 test
+> vitest run --reporter=verbose
+
+
+ RUN  v2.1.9 <repo>/server
+
+ ✓ tests/api/account-management.api.test.ts > POST /api/accounts > TEST-62 creates an owned account with balance 0 (AC-43) 2112ms
+ ✓ tests/api/account-management.api.test.ts > POST /api/accounts > TEST-62 rejects invalid bodies with the field named and creates nothing (AC-44)
+ ✓ tests/api/account-management.api.test.ts > Unique names and rename > TEST-63 refuses a duplicate name ignoring case and spaces; other users may reuse it (AC-45)
+ ✓ tests/api/account-management.api.test.ts > Unique names and rename > TEST-63 a duplicate name also counts archived accounts (AC-45)
+ ✓ tests/api/account-management.api.test.ts > Unique names and rename > TEST-63 renames, and the new name shows on existing transactions (AC-46)
+ ✓ tests/api/account-management.api.test.ts > Unique names and rename > TEST-63 another user's account id is not found and stays unchanged (AC-46, BR-21)
+ ✓ tests/api/account-management.api.test.ts > Archive and restore > TEST-64 an archived account keeps its balance and summary, but new use is refused (AC-47, BR-16)
+ ✓ tests/api/account-management.api.test.ts > DELETE /api/accounts/:id > TEST-65 deletes an unused account (AC-48)
+ ✓ tests/api/account-management.api.test.ts > DELETE /api/accounts/:id > TEST-65 refuses to delete an account used as header or line (AC-48, BR-17)
+ ✓ tests/api/account-management.api.test.ts > DELETE /api/accounts/:id > TEST-65 another user's account id is not found (AC-48)
+ ✓ tests/api/account-management.api.test.ts > Type change > TEST-66 allows a type change only while unused and without opening balance (AC-49, BR-17)
+ ✓ tests/api/transactions.api.test.ts > POST /api/transactions - normal journeys > TEST-24 saves a payment with its line atomically and moves both balances (AC-21) 2127ms
+ ✓ tests/api/transactions.api.test.ts > POST /api/transactions - normal journeys > TEST-25 card purchase split across Dining and Groceries raises card debt (AC-22)
+ ✓ tests/api/transactions.api.test.ts > POST /api/transactions - normal journeys > TEST-26 card repayment from the bank is not an expense (AC-23, BR-08)
+ ✓ tests/api/transactions.api.test.ts > POST /api/transactions - normal journeys > TEST-27 salary received increases bank and Salary (AC-24)
+ ✓ tests/api/transactions.api.test.ts > POST /api/transactions - rejections save nothing > TEST-29 rejects an allocation mismatch with 422 and writes no rows (AC-25, BR-01, NFR-05)
+ ✓ tests/api/transactions.api.test.ts > POST /api/transactions - rejections save nothing > TEST-31 rejects a payment line to an income account (AC-26)
+ ✓ tests/api/transactions.api.test.ts > POST /api/transactions - rejections save nothing > TEST-34 rejects malformed input with 400 naming the field (AC-28)
+ ✓ tests/api/transactions.api.test.ts > POST /api/transactions - rejections save nothing > TEST-35 another user's account is indistinguishable from a missing one (AC-29, BR-06)
+ ✓ tests/api/transactions.api.test.ts > POST /api/transactions - rejections save nothing > TEST-36 a failing line insert rolls back the header (AC-30, BR-12)
+ ✓ tests/api/transactions.api.test.ts > GET /api/transactions > TEST-38 lists only the caller's transactions, date desc then newest first (AC-32, BR-15)
+ ✓ tests/api/transactions.api.test.ts > GET /api/transactions > TEST-39 returns the caller's detail and 404 for others, unknown and malformed ids (AC-33)
+ ✓ tests/api/transaction-correction.api.test.ts > PUT /api/transactions/:id > TEST-69 replaces the header and lines and balances follow (AC-51) 2203ms
+ ✓ tests/api/transaction-correction.api.test.ts > PUT /api/transactions/:id > TEST-70 an invalid edit gets the same error as a new transaction and changes nothing (AC-52)
+ ✓ tests/api/transaction-correction.api.test.ts > PUT /api/transactions/:id > TEST-71 keeps archived accounts already on the transaction, refuses other archived ones (AC-53)
+ ✓ tests/api/transaction-correction.api.test.ts > DELETE /api/transactions/:id > TEST-72 removes the transaction and its lines; balances and summary go back (AC-54)
+ ✓ tests/api/transaction-correction.api.test.ts > Ownership > TEST-73 another user's, unknown or malformed id is not found and nothing changes (AC-55, BR-19, BR-21)
+ ✓ tests/api/transaction-correction.api.test.ts > Atomic edit > TEST-74 a failure while writing the new lines keeps the old header and lines (AC-56, NFR-05)
+ ✓ tests/api/accounts.api.test.ts > GET /api/accounts > TEST-16 returns only the caller's accounts, ordered by type then name, with balances (AC-14, BR-21) 2078ms
+ ✓ tests/api/accounts.api.test.ts > PUT /api/accounts/:id/opening-balance > TEST-21 sets the opening balance and the balance rises by it (AC-18)
+ ✓ tests/api/accounts.api.test.ts > PUT /api/accounts/:id/opening-balance > TEST-22 refuses income/expense accounts and invalid values, leaving the value unchanged (AC-19, BR-09)
+ ✓ tests/api/accounts.api.test.ts > PUT /api/accounts/:id/opening-balance > TEST-23 treats another user's account exactly like a missing one (AC-20, BR-06)
+ ✓ tests/api/accounts.api.test.ts > opening balance range by account type (BR-09 rev. 3.0) > TEST-103 accepts a negative Cash opening down to -10,000,000.00 and derives the balance (AC-90)
+ ✓ tests/api/accounts.api.test.ts > opening balance range by account type (BR-09 rev. 3.0) > TEST-104 refuses values below the lower bound of each type, leaving the value unchanged (AC-91, AC-19 rev. 2)
+ ✓ tests/api/accounts.api.test.ts > opening balance range by account type (BR-09 rev. 3.0) > TEST-106 the database CHECK allows a negative opening only on Cash, within range (BR-13)
+ ✓ tests/unit/transaction-rules.test.ts > TEST-28 allocation must equal the total (AC-25, BR-01) > accepts lines that sum exactly to the total
+ ✓ tests/unit/transaction-rules.test.ts > TEST-28 allocation must equal the total (AC-25, BR-01) > rejects lines one satang short or over
+ ✓ tests/unit/transaction-rules.test.ts > TEST-30 header and line account types (AC-26, BR-03, BR-04) > rejects payment from an expense account
+ ✓ tests/unit/transaction-rules.test.ts > TEST-30 header and line account types (AC-26, BR-03, BR-04) > rejects payment from an income account
+ ✓ tests/unit/transaction-rules.test.ts > TEST-30 header and line account types (AC-26, BR-03, BR-04) > rejects receipt into a loan-taken account
+ ✓ tests/unit/transaction-rules.test.ts > TEST-30 header and line account types (AC-26, BR-03, BR-04) > rejects payment line to an income account
+ ✓ tests/unit/transaction-rules.test.ts > TEST-30 header and line account types (AC-26, BR-03, BR-04) > rejects receipt line to an expense account
+ ✓ tests/unit/transaction-rules.test.ts > TEST-30 header and line account types (AC-26, BR-03, BR-04) > accepts every allowed line type for each kind
+ ✓ tests/unit/transaction-rules.test.ts > TEST-32 no self or repeated line accounts (AC-27, BR-05) > rejects a line that uses the header account
+ ✓ tests/unit/transaction-rules.test.ts > TEST-32 no self or repeated line accounts (AC-27, BR-05) > rejects the same account on two lines
+ ✓ tests/unit/transaction-rules.test.ts > ownership is resolved before rules (AC-29, BR-06) > reports an account outside the caller's set as ACCOUNT_NOT_FOUND
+ ✓ tests/unit/transaction-rules.test.ts > TEST-68 accounts an edit may use (AC-53, F-10 §3 step 3) > allows active accounts plus archived accounts already on the transaction
+ ✓ tests/unit/transaction-rules.test.ts > TEST-68 accounts an edit may use (AC-53, F-10 §3 step 3) > still refuses a different archived account
+ ✓ tests/unit/transaction-rules.test.ts > TEST-68 accounts an edit may use (AC-53, F-10 §3 step 3) > a new transaction keeps nothing archived
+ ✓ tests/api/auth.api.test.ts > POST /api/auth/login > TEST-01 signs in with valid credentials and sets a protected cookie (AC-01)
+ ✓ tests/api/auth.api.test.ts > POST /api/auth/login > TEST-02 gives one identical 401 for wrong password, unknown e-mail and disabled user (AC-02, BR-24)
+ ✓ tests/api/auth.api.test.ts > POST /api/auth/login > TEST-03 rejects a missing e-mail or password with 400 (AC-03)
+ ✓ tests/api/auth.api.test.ts > current user, sign-out and expiry > TEST-04 returns the caller's own identity, 401 when anonymous (AC-04)
+ ✓ tests/api/auth.api.test.ts > current user, sign-out and expiry > TEST-05 sign-out deletes the session; the old token is refused (AC-05)
+ ✓ tests/api/auth.api.test.ts > current user, sign-out and expiry > TEST-06 refuses an expired session and deletes its row (AC-06)
+ ✓ tests/api/auth.api.test.ts > current user, sign-out and expiry > TEST-08 stores only a scrypt hash of the password (AC-07, NFR-02)
+ ✓ tests/api/history-filter.api.test.ts > TEST-82 each filter returns exactly the expected transactions (AC-58) > date range 2076ms
+ ✓ tests/api/history-filter.api.test.ts > TEST-82 each filter returns exactly the expected transactions (AC-58) > account as header
+ ✓ tests/api/history-filter.api.test.ts > TEST-82 each filter returns exactly the expected transactions (AC-58) > account as line
+ ✓ tests/api/history-filter.api.test.ts > TEST-82 each filter returns exactly the expected transactions (AC-58) > account as header or line
+ ✓ tests/api/history-filter.api.test.ts > TEST-82 each filter returns exactly the expected transactions (AC-58) > kind
+ ✓ tests/api/history-filter.api.test.ts > TEST-82 each filter returns exactly the expected transactions (AC-58) > text in description, any case
+ ✓ tests/api/history-filter.api.test.ts > TEST-82 each filter returns exactly the expected transactions (AC-58) > text in a line note
+ ✓ tests/api/history-filter.api.test.ts > TEST-82 each filter returns exactly the expected transactions (AC-58) > amount range inclusive
+ ✓ tests/api/history-filter.api.test.ts > TEST-82 each filter returns exactly the expected transactions (AC-58) > favourites
+ ✓ tests/api/history-filter.api.test.ts > TEST-82 each filter returns exactly the expected transactions (AC-58) > two filters with AND
+ ✓ tests/api/history-filter.api.test.ts > TEST-83 invalid queries are refused with the field named (AC-59) > from=2026-02-30
+ ✓ tests/api/history-filter.api.test.ts > TEST-83 invalid queries are refused with the field named (AC-59) > from=2026-11-30&to=2026-11-01
+ ✓ tests/api/history-filter.api.test.ts > TEST-83 invalid queries are refused with the field named (AC-59) > minSatang=-1
+ ✓ tests/api/history-filter.api.test.ts > TEST-83 invalid queries are refused with the field named (AC-59) > minSatang=1.5
+ ✓ tests/api/history-filter.api.test.ts > TEST-83 invalid queries are refused with the field named (AC-59) > minSatang=500&maxSatang=100
+ ✓ tests/api/history-filter.api.test.ts > TEST-83 invalid queries are refused with the field named (AC-59) > kind=OTHER
+ ✓ tests/api/history-filter.api.test.ts > TEST-83 invalid queries are refused with the field named (AC-59) > accountId=abc
+ ✓ tests/api/history-filter.api.test.ts > TEST-83 invalid queries are refused with the field named (AC-59) > favourite=yes
+ ✓ tests/api/history-filter.api.test.ts > TEST-83 invalid queries are refused with the field named (AC-59) > q=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+ ✓ tests/api/history-filter.api.test.ts > TEST-84 filters never reach another user's data (AC-60, BR-21) > a query matching B's data returns only A's
+ ✓ tests/api/history-filter.api.test.ts > TEST-84 filters never reach another user's data (AC-60, BR-21) > B's account id matches nothing for A
+ ✓ tests/api/history-filter.api.test.ts > TEST-85 pagination (AC-61) > limit=2&offset=2 returns the 3rd and 4th items and the full total
+ ✓ tests/api/loans.api.test.ts > GET /api/loans > TEST-88 outstanding equals the account balance; history and totals (AC-68, AC-69) 2105ms
+ ✓ tests/api/loans.api.test.ts > GET /api/loans > TEST-89 only the caller's loans; admin 403; anonymous 401 (AC-70)
+ ✓ tests/api/loans.api.test.ts > GET /api/loans > TEST-90 archived loans are listed only while something is outstanding (AC-71)
+ ✓ tests/api/access.api.test.ts > TEST-11 every protected route refuses anonymous callers (AC-09, NFR-01) > GET /api/auth/me -> 401 with no data
+ ✓ tests/api/access.api.test.ts > TEST-11 every protected route refuses anonymous callers (AC-09, NFR-01) > POST /api/auth/logout -> 401 with no data
+ ✓ tests/api/access.api.test.ts > TEST-11 every protected route refuses anonymous callers (AC-09, NFR-01) > GET /api/accounts -> 401 with no data
+ ✓ tests/api/access.api.test.ts > TEST-11 every protected route refuses anonymous callers (AC-09, NFR-01) > PUT /api/accounts/1/opening-balance -> 401 with no data
+ ✓ tests/api/access.api.test.ts > TEST-11 every protected route refuses anonymous callers (AC-09, NFR-01) > POST /api/transactions -> 401 with no data
+ ✓ tests/api/access.api.test.ts > TEST-11 every protected route refuses anonymous callers (AC-09, NFR-01) > GET /api/transactions -> 401 with no data
+ ✓ tests/api/access.api.test.ts > TEST-11 every protected route refuses anonymous callers (AC-09, NFR-01) > GET /api/transactions/1 -> 401 with no data
+ ✓ tests/api/access.api.test.ts > TEST-11 every protected route refuses anonymous callers (AC-09, NFR-01) > GET /api/summary -> 401 with no data
+ ✓ tests/api/access.api.test.ts > TEST-11 every protected route refuses anonymous callers (AC-09, NFR-01) > GET /api/admin/users -> 401 with no data
+ ✓ tests/api/access.api.test.ts > TEST-11 every protected route refuses anonymous callers (AC-09, NFR-01) > PATCH /api/admin/users/1 -> 401 with no data
+ ✓ tests/api/access.api.test.ts > TEST-12 an administrator gets no financial data (AC-10, BR-20) > GET /api/accounts -> 403
+ ✓ tests/api/access.api.test.ts > TEST-12 an administrator gets no financial data (AC-10, BR-20) > PUT /api/accounts/1/opening-balance -> 403
+ ✓ tests/api/access.api.test.ts > TEST-12 an administrator gets no financial data (AC-10, BR-20) > POST /api/transactions -> 403
+ ✓ tests/api/access.api.test.ts > TEST-12 an administrator gets no financial data (AC-10, BR-20) > GET /api/transactions -> 403
+ ✓ tests/api/access.api.test.ts > TEST-12 an administrator gets no financial data (AC-10, BR-20) > GET /api/transactions/1 -> 403
+ ✓ tests/api/access.api.test.ts > TEST-12 an administrator gets no financial data (AC-10, BR-20) > GET /api/summary -> 403
+ ✓ tests/api/access.api.test.ts > TEST-13 a user cannot call admin operations (AC-11) > GET /api/admin/users -> 403
+ ✓ tests/api/access.api.test.ts > TEST-13 a user cannot call admin operations (AC-11) > PATCH /api/admin/users/1 -> 403
+ ✓ tests/api/access.api.test.ts > TEST-14 cross-site writes are refused (AC-12) > POST with a foreign Origin -> 403 and nothing saved
+ ✓ tests/api/access.api.test.ts > TEST-92 Sprint 2 routes refuse anonymous callers and administrators (AC-09, AC-10 extended) > POST /api/accounts -> 401 anonymous, 403 admin
+ ✓ tests/api/access.api.test.ts > TEST-92 Sprint 2 routes refuse anonymous callers and administrators (AC-09, AC-10 extended) > PATCH /api/accounts/1 -> 401 anonymous, 403 admin
+ ✓ tests/api/access.api.test.ts > TEST-92 Sprint 2 routes refuse anonymous callers and administrators (AC-09, AC-10 extended) > DELETE /api/accounts/1 -> 401 anonymous, 403 admin
+ ✓ tests/api/access.api.test.ts > TEST-92 Sprint 2 routes refuse anonymous callers and administrators (AC-09, AC-10 extended) > PUT /api/transactions/1 -> 401 anonymous, 403 admin
+ ✓ tests/api/access.api.test.ts > TEST-92 Sprint 2 routes refuse anonymous callers and administrators (AC-09, AC-10 extended) > DELETE /api/transactions/1 -> 401 anonymous, 403 admin
+ ✓ tests/api/access.api.test.ts > TEST-92 Sprint 2 routes refuse anonymous callers and administrators (AC-09, AC-10 extended) > PUT /api/transactions/1/favourite -> 401 anonymous, 403 admin
+ ✓ tests/api/access.api.test.ts > TEST-92 Sprint 2 routes refuse anonymous callers and administrators (AC-09, AC-10 extended) > GET /api/loans -> 401 anonymous, 403 admin
+ ✓ tests/unit/account-rules.test.ts > TEST-60 account name, type and subtype rules (AC-44, F-09 §3 steps 2-4) > accepts a valid Cash/Bank account and trims the name
+ ✓ tests/unit/account-rules.test.ts > TEST-60 account name, type and subtype rules (AC-44, F-09 §3 steps 2-4) > rejects a blank or 61-character name and accepts 60 characters
+ ✓ tests/unit/account-rules.test.ts > TEST-60 account name, type and subtype rules (AC-44, F-09 §3 steps 2-4) > rejects an unknown type
+ ✓ tests/unit/account-rules.test.ts > TEST-60 account name, type and subtype rules (AC-44, F-09 §3 steps 2-4) > rejects CASH with subtype undefined
+ ✓ tests/unit/account-rules.test.ts > TEST-60 account name, type and subtype rules (AC-44, F-09 §3 steps 2-4) > rejects CASH with subtype null
+ ✓ tests/unit/account-rules.test.ts > TEST-60 account name, type and subtype rules (AC-44, F-09 §3 steps 2-4) > rejects CASH with subtype CREDIT_CARD
+ ✓ tests/unit/account-rules.test.ts > TEST-60 account name, type and subtype rules (AC-44, F-09 §3 steps 2-4) > rejects CASH with subtype PERSONAL
+ ✓ tests/unit/account-rules.test.ts > TEST-60 account name, type and subtype rules (AC-44, F-09 §3 steps 2-4) > rejects LOAN_TAKEN with subtype undefined
+ ✓ tests/unit/account-rules.test.ts > TEST-60 account name, type and subtype rules (AC-44, F-09 §3 steps 2-4) > rejects LOAN_TAKEN with subtype BANK
+ ✓ tests/unit/account-rules.test.ts > TEST-60 account name, type and subtype rules (AC-44, F-09 §3 steps 2-4) > rejects LOAN_GIVEN with subtype CREDIT_CARD
+ ✓ tests/unit/account-rules.test.ts > TEST-60 account name, type and subtype rules (AC-44, F-09 §3 steps 2-4) > rejects LOAN_GIVEN with subtype WALLET
+ ✓ tests/unit/account-rules.test.ts > TEST-60 account name, type and subtype rules (AC-44, F-09 §3 steps 2-4) > rejects INCOME with subtype BANK
+ ✓ tests/unit/account-rules.test.ts > TEST-60 account name, type and subtype rules (AC-44, F-09 §3 steps 2-4) > rejects EXPENSE with subtype OTHER
+ ✓ tests/unit/account-rules.test.ts > TEST-60 account name, type and subtype rules (AC-44, F-09 §3 steps 2-4) > accepts CASH with subtype WALLET (stored as WALLET)
+ ✓ tests/unit/account-rules.test.ts > TEST-60 account name, type and subtype rules (AC-44, F-09 §3 steps 2-4) > accepts CASH with subtype BANK (stored as BANK)
+ ✓ tests/unit/account-rules.test.ts > TEST-60 account name, type and subtype rules (AC-44, F-09 §3 steps 2-4) > accepts LOAN_TAKEN with subtype CREDIT_CARD (stored as CREDIT_CARD)
+ ✓ tests/unit/account-rules.test.ts > TEST-60 account name, type and subtype rules (AC-44, F-09 §3 steps 2-4) > accepts LOAN_TAKEN with subtype PERSONAL (stored as PERSONAL)
+ ✓ tests/unit/account-rules.test.ts > TEST-60 account name, type and subtype rules (AC-44, F-09 §3 steps 2-4) > accepts LOAN_TAKEN with subtype OTHER (stored as OTHER)
+ ✓ tests/unit/account-rules.test.ts > TEST-60 account name, type and subtype rules (AC-44, F-09 §3 steps 2-4) > accepts LOAN_GIVEN with subtype undefined (stored as PERSONAL)
+ ✓ tests/unit/account-rules.test.ts > TEST-60 account name, type and subtype rules (AC-44, F-09 §3 steps 2-4) > accepts LOAN_GIVEN with subtype OTHER (stored as OTHER)
+ ✓ tests/unit/account-rules.test.ts > TEST-60 account name, type and subtype rules (AC-44, F-09 §3 steps 2-4) > accepts INCOME with subtype undefined (stored as null)
+ ✓ tests/unit/account-rules.test.ts > TEST-60 account name, type and subtype rules (AC-44, F-09 §3 steps 2-4) > accepts EXPENSE with subtype null (stored as null)
+ ✓ tests/unit/account-rules.test.ts > TEST-60 PATCH body rules (F-09 §3 step 5) > needs at least one of name, isActive, type
+ ✓ tests/unit/account-rules.test.ts > TEST-60 PATCH body rules (F-09 §3 step 5) > isActive must be a boolean
+ ✓ tests/unit/account-rules.test.ts > TEST-60 PATCH body rules (F-09 §3 step 5) > accepts rename, archive and type change
+ ✓ tests/unit/account-rules.test.ts > TEST-60 PATCH body rules (F-09 §3 step 5) > applies the name and subtype rules to a patch too
+ ✓ tests/unit/account-rules.test.ts > TEST-61 names compare trimmed and case-insensitive (AC-45) > treats different case and spaces as the same name
+ ✓ tests/unit/account-rules.test.ts > TEST-61 names compare trimmed and case-insensitive (AC-45) > keeps different names different
+ ✓ tests/unit/loans.test.ts > TEST-87 loanHistory (AC-68, AC-69) > Loan Given: opening first, then lend (+) and repayment (−) in date order with a running balance
+ ✓ tests/unit/loans.test.ts > TEST-87 loanHistory (AC-68, AC-69) > Loan Taken: a card charge as header (+) and a repayment as line (−)
+ ✓ tests/unit/loans.test.ts > TEST-87 loanHistory (AC-68, AC-69) > the outstanding always equals the balance engine (BR-07, BR-13)
+ ✓ tests/unit/loans.test.ts > TEST-87 loanHistory (AC-68, AC-69) > orders same-day rows by creation time, then id
+ ✓ tests/unit/loans.test.ts > TEST-87 loanHistory (AC-68, AC-69) > an account with no opening and no transactions has an empty history and 0 outstanding
+ ✓ tests/unit/summary.test.ts > TEST-41 summary of the Sprint 1 journey (AC-35, BR-08) > computes balances, debt, income, expenses, net and category spending
+ ✓ tests/unit/summary.test.ts > TEST-41 summary of the Sprint 1 journey (AC-35, BR-08) > never counts transfers, borrowing, lending, repayments or opening balances as income or expense
+ ✓ tests/unit/summary.test.ts > TEST-43 (unit part) date range affects flows only (AC-36) > counts only lines dated inside the inclusive range, balances stay all-time
+ ✓ tests/api/password.api.test.ts > PUT /api/auth/password > TEST-95 changes the password, keeps this session and ends the others (AC-76) 2532ms
+ ✓ tests/api/password.api.test.ts > PUT /api/auth/password > TEST-96 a wrong current password or a bad new password changes nothing (AC-77, AC-78)
+ ✓ tests/api/password.api.test.ts > PUT /api/auth/password > TEST-97 anonymous is refused; an administrator changes only their own password (AC-79)
+ ✓ tests/api/admin.api.test.ts > admin user management > TEST-45 lists users with identity fields only - no hash, no financial data (AC-38, BR-20)
+ ✓ tests/api/admin.api.test.ts > admin user management > TEST-46 disabling ends the user's sessions and sign-in; enabling restores sign-in (AC-39, BR-23)
+ ✓ tests/api/admin.api.test.ts > admin user management > TEST-47 an admin cannot disable their own account (AC-40, BR-22)
+ ✓ tests/api/admin.api.test.ts > admin user management > TEST-48 unknown ids are 404 and bad bodies are 400 (AC-41)
+ ✓ tests/unit/balances.test.ts > TEST-17 balance effects for every kind and account type (AC-15, BR-07) > payment from cash to expense
+ ✓ tests/unit/balances.test.ts > TEST-17 balance effects for every kind and account type (AC-15, BR-07) > card charge to expense (debt grows)
+ ✓ tests/unit/balances.test.ts > TEST-17 balance effects for every kind and account type (AC-15, BR-07) > payment repays a loan taken
+ ✓ tests/unit/balances.test.ts > TEST-17 balance effects for every kind and account type (AC-15, BR-07) > payment lends money (loan given)
+ ✓ tests/unit/balances.test.ts > TEST-17 balance effects for every kind and account type (AC-15, BR-07) > payment transfers cash to cash
+ ✓ tests/unit/balances.test.ts > TEST-17 balance effects for every kind and account type (AC-15, BR-07) > receipt of income
+ ✓ tests/unit/balances.test.ts > TEST-17 balance effects for every kind and account type (AC-15, BR-07) > receipt repays a loan given
+ ✓ tests/unit/balances.test.ts > TEST-17 balance effects for every kind and account type (AC-15, BR-07) > receipt of new borrowing
+ ✓ tests/unit/balances.test.ts > TEST-17 balance effects for every kind and account type (AC-15, BR-07) > receipt transfers cash from cash
+ ✓ tests/unit/balances.test.ts > TEST-19 balance = opening + effects, exactly (AC-16, BR-13, NFR-04) > adds 0.10 + 0.20 THB to an opening of 0.10 THB as exactly 40 satang
+ ✓ tests/unit/balances.test.ts > TEST-19 balance = opening + effects, exactly (AC-16, BR-13, NFR-04) > lets a cash balance go negative (BR-14)
+ ✓ tests/api/favourites.api.test.ts > PUT /api/transactions/:id/favourite > TEST-75 marks and unmarks; rejects a non-boolean; another user's id is not found (AC-63)
+ ✓ tests/api/favourites.api.test.ts > GET /api/transactions?favourite=true > TEST-76 returns only the caller's favourites (AC-64) 2175ms
+ ✓ tests/api/summary.api.test.ts > GET /api/summary > TEST-42 shows the journey figures exactly (AC-35)
+ ✓ tests/api/summary.api.test.ts > GET /api/summary > TEST-43 limits flows to the range and validates it (AC-36)
+ ✓ tests/api/summary.api.test.ts > GET /api/summary > TEST-44 another user's activity never changes this summary (AC-37, BR-21)
+ ✓ tests/unit/transaction-input.test.ts > TEST-33 input boundaries (AC-28, BR-02, BR-10, BR-11) > accepts the valid side of every boundary
+ ✓ tests/unit/transaction-input.test.ts > TEST-33 input boundaries (AC-28, BR-02, BR-10, BR-11) > rejects total 0
+ ✓ tests/unit/transaction-input.test.ts > TEST-33 input boundaries (AC-28, BR-02, BR-10, BR-11) > rejects total negative
+ ✓ tests/unit/transaction-input.test.ts > TEST-33 input boundaries (AC-28, BR-02, BR-10, BR-11) > rejects total fractional
+ ✓ tests/unit/transaction-input.test.ts > TEST-33 input boundaries (AC-28, BR-02, BR-10, BR-11) > rejects total over limit
+ ✓ tests/unit/transaction-input.test.ts > TEST-33 input boundaries (AC-28, BR-02, BR-10, BR-11) > rejects unknown kind
+ ✓ tests/unit/transaction-input.test.ts > TEST-33 input boundaries (AC-28, BR-02, BR-10, BR-11) > rejects account id text
+ ✓ tests/unit/transaction-input.test.ts > TEST-33 input boundaries (AC-28, BR-02, BR-10, BR-11) > rejects tomorrow
+ ✓ tests/unit/transaction-input.test.ts > TEST-33 input boundaries (AC-28, BR-02, BR-10, BR-11) > rejects before 2000
+ ✓ tests/unit/transaction-input.test.ts > TEST-33 input boundaries (AC-28, BR-02, BR-10, BR-11) > rejects impossible date
+ ✓ tests/unit/transaction-input.test.ts > TEST-33 input boundaries (AC-28, BR-02, BR-10, BR-11) > rejects wrong format
+ ✓ tests/unit/transaction-input.test.ts > TEST-33 input boundaries (AC-28, BR-02, BR-10, BR-11) > rejects description 201 chars
+ ✓ tests/unit/transaction-input.test.ts > TEST-33 input boundaries (AC-28, BR-02, BR-10, BR-11) > rejects no lines
+ ✓ tests/unit/transaction-input.test.ts > TEST-33 input boundaries (AC-28, BR-02, BR-10, BR-11) > rejects 21 lines
+ ✓ tests/unit/transaction-input.test.ts > TEST-33 input boundaries (AC-28, BR-02, BR-10, BR-11) > rejects line amount 0
+ ✓ tests/unit/transaction-input.test.ts > TEST-33 input boundaries (AC-28, BR-02, BR-10, BR-11) > rejects line note 101 chars
+ ✓ tests/unit/transaction-input.test.ts > TEST-33 input boundaries (AC-28, BR-02, BR-10, BR-11) > ignores a userId sent in the body
+ ✓ tests/unit/history-filter.test.ts > TEST-81 parseHistoryFilter (AC-59) > parses a full valid query into a typed filter
+ ✓ tests/unit/history-filter.test.ts > TEST-81 parseHistoryFilter (AC-59) > an empty query gives the Sprint 1 defaults
+ ✓ tests/unit/history-filter.test.ts > TEST-81 parseHistoryFilter (AC-59) > empty strings and favourite=false mean no filter
+ ✓ tests/unit/history-filter.test.ts > TEST-81 parseHistoryFilter (AC-59) > clamps limit and offset like Sprint 1
+ ✓ tests/unit/history-filter.test.ts > TEST-81 parseHistoryFilter (AC-59) > rejects {"from":"2026-02-30"} naming from
+ ✓ tests/unit/history-filter.test.ts > TEST-81 parseHistoryFilter (AC-59) > rejects {"to":"26-11-01"} naming to
+ ✓ tests/unit/history-filter.test.ts > TEST-81 parseHistoryFilter (AC-59) > rejects {"from":"2026-11-30","to":"2026-11-01"} naming from
+ ✓ tests/unit/history-filter.test.ts > TEST-81 parseHistoryFilter (AC-59) > rejects {"minSatang":"-1"} naming minSatang
+ ✓ tests/unit/history-filter.test.ts > TEST-81 parseHistoryFilter (AC-59) > rejects {"minSatang":"1.5"} naming minSatang
+ ✓ tests/unit/history-filter.test.ts > TEST-81 parseHistoryFilter (AC-59) > rejects {"maxSatang":"1000000001"} naming maxSatang
+ ✓ tests/unit/history-filter.test.ts > TEST-81 parseHistoryFilter (AC-59) > rejects {"minSatang":"500","maxSatang":"100"} naming minSatang
+ ✓ tests/unit/history-filter.test.ts > TEST-81 parseHistoryFilter (AC-59) > rejects {"kind":"OTHER"} naming kind
+ ✓ tests/unit/history-filter.test.ts > TEST-81 parseHistoryFilter (AC-59) > rejects {"accountId":"abc"} naming accountId
+ ✓ tests/unit/history-filter.test.ts > TEST-81 parseHistoryFilter (AC-59) > rejects {"accountId":"0"} naming accountId
+ ✓ tests/unit/history-filter.test.ts > TEST-81 parseHistoryFilter (AC-59) > rejects {"favourite":"yes"} naming favourite
+ ✓ tests/unit/history-filter.test.ts > TEST-81 parseHistoryFilter (AC-59) > rejects {"q":"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"} naming q
+ ✓ tests/unit/history-filter.test.ts > TEST-81 parseHistoryFilter (AC-59) > accepts the boundaries: 100-character text, 0 and 1,000,000,000 satang, from = to
+ ✓ tests/api/ops.api.test.ts > TEST-53 readiness reports a working database > GET /api/ready -> 200 with db connected 2107ms
+ ✓ tests/api/ops.api.test.ts > TEST-54 version shows the running commit > returns APP_COMMIT_SHA, or 'unknown' when it is not set
+ ✓ tests/api/ops.api.test.ts > TEST-55 writes from the app's own origin are allowed; foreign origins are not > accepts Origin equal to the request host and still refuses another host
+ ✓ tests/unit/password-policy.test.ts > TEST-94 checkNewPassword (AC-78) > rejects "xxxxxxxxxxx"
+ ✓ tests/unit/password-policy.test.ts > TEST-94 checkNewPassword (AC-78) > rejects "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+ ✓ tests/unit/password-policy.test.ts > TEST-94 checkNewPassword (AC-78) > rejects ""
+ ✓ tests/unit/password-policy.test.ts > TEST-94 checkNewPassword (AC-78) > rejects undefined
+ ✓ tests/unit/password-policy.test.ts > TEST-94 checkNewPassword (AC-78) > rejects 42
+ ✓ tests/unit/password-policy.test.ts > TEST-94 checkNewPassword (AC-78) > rejects the current password again
+ ✓ tests/unit/password-policy.test.ts > TEST-94 checkNewPassword (AC-78) > accepts 12 and 128 characters
+ ✓ tests/unit/password-policy.test.ts > TEST-94 checkNewPassword (AC-78) > requires the current password to be a string
+ ✓ tests/unit/http-error.test.ts > TEST-15 safe 500 errors (AC-13, NFR-06) > returns a generic INTERNAL_ERROR with no stack, SQL or path
+ ✓ tests/unit/session.test.ts > TEST-06 session expiry (AC-06, NFR-03) > expires exactly 8 hours after creation, absolutely
+ ✓ tests/unit/session.test.ts > TEST-06 session expiry (AC-06, NFR-03) > uses 256-bit random tokens and stores only their SHA-256
+ ✓ tests/unit/money.test.ts > TEST-18 money parsing and formatting (AC-16, NFR-04) > parses THB text with up to two decimals into exact satang
+ ✓ tests/unit/money.test.ts > TEST-18 money parsing and formatting (AC-16, NFR-04) > rejects three decimals, signs, text and empty input
+ ✓ tests/unit/money.test.ts > TEST-18 money parsing and formatting (AC-16, NFR-04) > formats satang as baht with separators and a sign
+ ✓ tests/unit/password.test.ts > TEST-07 password hashing (AC-07, NFR-02) > stores scrypt hashes that differ per call and verify only the right password
+ ✓ tests/unit/seed-config.test.ts > TEST-56 seed settings come from the environment (R-02) > requires ADMIN_PASSWORD and creates demo users only when asked
+
+ Test Files  26 passed (26)
+      Tests  219 passed (219)
+   Start at  23:12:58
+   Duration  76.58s (transform 410ms, setup 0ms, collect 5.86s, tests 52.33s, environment 5ms, prepare 2.92s)
+
+exit code: 0
+
+== DEBUG_PRINT_LIMIT=400 npm test --prefix client -- --reporter=verbose
+
+> moneylog-client@0.1.0 test
+> vitest run --reporter=verbose
+
+
+ RUN  v2.1.9 <repo>/client
+
+stderr | tests/Footer.test.tsx > TEST-57 footer shows the running release (Lab 5 R-08) > shows the short commit from /api/version on the sign-in page and inside the app
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | tests/AdminUsers.test.tsx > TEST-49 users page (AC-42) > disables another user and shows the new status; no Disable on own row
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | tests/Login.test.tsx > TEST-10 sign-in form (AC-08) > shows the server's sign-in failure message and stays on the form
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | tests/Loans.test.tsx > TEST-91 Loans page (AC-72) > shows both sections with totals, outstanding and history rows
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | tests/Accounts.test.tsx > TEST-20 accounts page (AC-17, BR-14) > formats balances in baht and marks a negative cash balance
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | tests/ChangePassword.test.tsx > TEST-98 change password page (AC-80) > checks that the new passwords match before sending
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | tests/NewTransaction.test.tsx > TEST-37 transaction form (AC-31) > updates Remaining live, enables Save only at zero, and keeps values on a server rule error
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | tests/History.test.tsx > TEST-40 history (AC-34) > shows the empty state when there are no transactions
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ tests/Footer.test.tsx > TEST-57 footer shows the running release (Lab 5 R-08) > shows the short commit from /api/version on the sign-in page and inside the app
+ ✓ tests/Footer.test.tsx > TEST-57 footer shows the running release (Lab 5 R-08) > is shown for a signed-in user
+ ✓ tests/History.test.tsx > TEST-40 history (AC-34) > shows the empty state when there are no transactions
+stderr | tests/TransactionDetail.test.tsx > TEST-77 edit and delete from the detail page (AC-57) > Edit opens the form pre-filled and Save changes sends a PUT
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ tests/Loans.test.tsx > TEST-91 Loans page (AC-72) > shows both sections with totals, outstanding and history rows
+ ✓ tests/AdminUsers.test.tsx > TEST-49 users page (AC-42) > disables another user and shows the new status; no Disable on own row
+ ✓ tests/Accounts.test.tsx > TEST-20 accounts page (AC-17, BR-14) > formats balances in baht and marks a negative cash balance
+ ✓ tests/Loans.test.tsx > TEST-91 Loans page (AC-72) > shows the empty message when a section has no loans
+ ✓ tests/History.test.tsx > TEST-40 history (AC-34) > shows one row per transaction
+ ✓ tests/Login.test.tsx > TEST-10 sign-in form (AC-08) > shows the server's sign-in failure message and stays on the form 700ms
+ ✓ tests/TransactionDetail.test.tsx > TEST-77 edit and delete from the detail page (AC-57) > Edit opens the form pre-filled and Save changes sends a PUT 736ms
+ ✓ tests/TransactionDetail.test.tsx > TEST-77 edit and delete from the detail page (AC-57) > Delete asks for confirmation, then deletes and returns to History
+ ✓ tests/TransactionDetail.test.tsx > TEST-79 favourite star (AC-67) > toggles the flag on the detail page
+ ✓ tests/Accounts.test.tsx > TEST-105 signed opening balance form (AC-90, AC-91) > sends a negative Cash opening and refuses a minus sign on a Loan account 752ms
+ ✓ tests/TransactionDetail.test.tsx > TEST-79 favourite star (AC-67) > filters History to favourites only
+ ✓ tests/NewTransaction.test.tsx > TEST-37 transaction form (AC-31) > updates Remaining live, enables Save only at zero, and keeps values on a server rule error 1097ms
+ ✓ tests/TransactionDetail.test.tsx > TEST-78 Duplicate (AC-65, AC-66, BR-18) > opens New transaction pre-filled with today's date and saves nothing until Save
+ ✓ tests/NewTransaction.test.tsx > TEST-67 archived accounts are not offered for a new transaction (AC-50, BR-16) > leaves an archived account out of the header and line selects
+ ✓ tests/TransactionDetail.test.tsx > TEST-78 Duplicate (AC-65, AC-66, BR-18) > leaves an archived line account empty with a message
+ ✓ tests/ChangePassword.test.tsx > TEST-98 change password page (AC-80) > checks that the new passwords match before sending 1115ms
+ ✓ tests/History.test.tsx > TEST-86 filter bar and pager (AC-62) > sends the filters, pages with Next/Previous, and clears 1000ms
+ ✓ tests/History.test.tsx > TEST-86 filter bar and pager (AC-62) > shows the no-match message for an empty filtered result
+ ✓ tests/Accounts.test.tsx > TEST-67 account management on the Accounts page (AC-50) > creates an account and shows it in its type group 434ms
+ ✓ tests/Accounts.test.tsx > TEST-67 account management on the Accounts page (AC-50) > archives an account into the Archived section and restores it
+ ✓ tests/History.test.tsx > TEST-86 filter bar and pager (AC-62) > blocks Apply while Min is above Max
+ ✓ tests/Accounts.test.tsx > TEST-67 account management on the Accounts page (AC-50) > offers Delete only for unused accounts and shows the in-use error
+ ✓ tests/ChangePassword.test.tsx > TEST-98 change password page (AC-80) > shows a server field error, then the success message 1414ms
+ ✓ tests/ChangePassword.test.tsx > TEST-98 change password page (AC-80) > is linked from the top bar for both roles
+
+ Test Files  9 passed (9)
+      Tests  27 passed (27)
+   Start at  23:14:16
+   Duration  6.31s (transform 600ms, setup 6.15s, collect 4.13s, tests 9.37s, environment 17.27s, prepare 2.33s)
+
+exit code: 0

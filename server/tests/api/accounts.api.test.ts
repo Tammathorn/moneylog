@@ -50,7 +50,8 @@ describe("PUT /api/accounts/:id/opening-balance", () => {
     const wallet = a.acc.Wallet;
     const tomorrow = new Date(Date.now() + 36 * 3600 * 1000).toISOString().slice(0, 10);
     const bad = [
-      { openingBalanceSatang: -1, openingDate: "2026-11-01" },
+      // rev. 2 (Lab 7, #64): -1 is valid for Cash under BR-09 rev. 3.0
+      { openingBalanceSatang: -1_000_000_001, openingDate: "2026-11-01" },
       { openingBalanceSatang: 1.5, openingDate: "2026-11-01" },
       { openingBalanceSatang: 1_000_000_001, openingDate: "2026-11-01" },
       { openingBalanceSatang: 100, openingDate: tomorrow > todayInBangkok() ? tomorrow : "2999-01-01" },
@@ -72,5 +73,56 @@ describe("PUT /api/accounts/:id/opening-balance", () => {
     expect(other.body).toEqual(missing.body);
     const row = await getPrisma().account.findUniqueOrThrow({ where: { id: b.acc["KBank Savings"] } });
     expect(row.openingBalanceSatang).toBe(0);
+  });
+});
+
+// Lab 7 CR-L7-01 (#64), BR-09 rev. 3.0. Fresh users keep these independent of the tests above.
+const stored = async (id: number) =>
+  (await getPrisma().account.findUniqueOrThrow({ where: { id } })).openingBalanceSatang;
+
+describe("opening balance range by account type (BR-09 rev. 3.0)", () => {
+  it("TEST-103 accepts a negative Cash opening down to -10,000,000.00 and derives the balance (AC-90)", async () => {
+    const u = await makeSignedInUser();
+    const wallet = u.acc.Wallet;
+    const payment = await u.agent.post("/api/transactions").send({ kind: "PAYMENT", accountId: wallet, date: "2026-11-10", totalSatang: 500,
+      lines: [{ accountId: u.acc.Dining, amountSatang: 500 }] });
+    expect(payment.status).toBe(201);
+
+    for (const openingBalanceSatang of [-1_000_000_000, -1]) {
+      const res = await u.agent.put(`/api/accounts/${wallet}/opening-balance`).send({ openingBalanceSatang, openingDate: "2026-11-01" });
+      expect(res.status, String(openingBalanceSatang)).toBe(200);
+      expect(res.body.account).toMatchObject({ id: wallet, openingBalanceSatang, balanceSatang: openingBalanceSatang - 500 });
+      expect(await stored(wallet)).toBe(openingBalanceSatang);
+      expect(await balanceOf(u.agent, wallet)).toBe(openingBalanceSatang - 500);
+    }
+  });
+
+  it("TEST-104 refuses values below the lower bound of each type, leaving the value unchanged (AC-91, AC-19 rev. 2)", async () => {
+    const u = await makeSignedInUser();
+    const cases = [
+      { id: u.acc.Wallet, openingBalanceSatang: -1_000_000_001 },
+      { id: u.acc["Loan to Beam"], openingBalanceSatang: -1 },
+      { id: u.acc["KTC Credit Card"], openingBalanceSatang: -1 },
+    ];
+    for (const { id, openingBalanceSatang } of cases) {
+      await getPrisma().account.update({ where: { id }, data: { openingBalanceSatang: 1_000 } });
+      const res = await u.agent.put(`/api/accounts/${id}/opening-balance`).send({ openingBalanceSatang, openingDate: "2026-11-01" });
+      expect(res.status, `account ${id}: ${openingBalanceSatang}`).toBe(400);
+      expect(res.body.error.code).toBe("VALIDATION_FAILED");
+      expect(res.body.error.fields).toHaveProperty("openingBalanceSatang");
+      expect(await stored(id)).toBe(1_000);
+    }
+  });
+
+  it("TEST-106 the database CHECK allows a negative opening only on Cash, within range (BR-13)", async () => {
+    const u = await makeSignedInUser();
+    const set = (id: number, openingBalanceSatang: number) =>
+      getPrisma().account.update({ where: { id }, data: { openingBalanceSatang } });
+
+    await expect(set(u.acc.Wallet, -1_000_000_000)).resolves.toMatchObject({ openingBalanceSatang: -1_000_000_000 });
+    await expect(set(u.acc["KTC Credit Card"], -1)).rejects.toThrow(/Account_openingBalance_range/);
+    await expect(set(u.acc.Wallet, -1_000_000_001)).rejects.toThrow(/Account_openingBalance_range/);
+    expect(await stored(u.acc.Wallet)).toBe(-1_000_000_000);
+    expect(await stored(u.acc["KTC Credit Card"])).toBe(0);
   });
 });

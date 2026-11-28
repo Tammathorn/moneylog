@@ -8,6 +8,14 @@ export function parseThb(text: string): number | null {
   return Number(baht) * 100 + Number(satang.padEnd(2, "0"));
 }
 
+// BR-09 rev. 3.0: a Cash opening balance may start with a minus sign. parseThb stays unsigned (AC-16).
+export function parseSignedThb(text: string): number | null {
+  const value = text.trim();
+  if (!value.startsWith("-")) return parseThb(value);
+  const satang = parseThb(value.slice(1));
+  return satang === null ? null : -satang;
+}
+
 export function formatThb(satang: number): string {
   const sign = satang < 0 ? "-" : "";
   const abs = Math.abs(satang);
