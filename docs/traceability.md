@@ -41,7 +41,7 @@ and passed on the stated version; "Planned" means not yet run. Test files are un
 | BR-07 | F-03 Balance engine | 1 | AC-15, AC-68 | TEST-17, TEST-24 – TEST-27, TEST-87 | balances.test.ts, loans.test.ts | Pass — `v0.1.0` (D1) and regression at `ffeead5` |
 | BR-08 | F-07 Income/expense only | 1 | AC-23, AC-35 | TEST-26, TEST-41, TEST-42 | summary.test.ts | Pass — `v0.1.0` (D1) and regression at `ffeead5` |
 | BR-09 | F-04 Opening rules | 1 | AC-19 | TEST-22 | accounts.api.test.ts | Pass — `v0.1.0` (D1) and regression at `ffeead5` |
-| BR-09 *rev. 3.0* | F-04 Opening rules (Lab 7, #64) | 1 (maint.) | AC-90, AC-91, AC-19 rev. 2 | TEST-101 – TEST-104, TEST-22 | accounts.api.test.ts, client/tests/Accounts.test.tsx | Planned (Lab 7) — not run |
+| BR-09 *rev. 3.0* | F-04 Opening rules (Lab 7, #64) | 1 (maint.) | AC-90, AC-91, AC-19 rev. 2 | TEST-103 – TEST-106, TEST-22 | accounts.api.test.ts, client/tests/Accounts.test.tsx | Planned (Lab 7) — not run |
 | BR-10 | F-05 Date range | 1 | AC-28 | TEST-33, TEST-34 | transaction-input.test.ts | Pass — `v0.1.0` (D1) and regression at `ffeead5` |
 | BR-11 | F-05 Text limits | 1 | AC-28 | TEST-33 | transaction-input.test.ts | Pass — `v0.1.0` (D1) and regression at `ffeead5` |
 | BR-12 | F-05/F-10 Atomic save/edit | 1 / 2 | AC-25, AC-30, AC-56 | TEST-29, TEST-36, TEST-74 | transactions.api.test.ts, transaction-correction.api.test.ts | Pass — `v0.1.0` (D1) and regression at `ffeead5`; edit: Pass — `ffeead5` (local) + CI on PR |
@@ -176,8 +176,8 @@ Every other FR/BR/NFR has implemented behaviour and an executed, passing test.
 | AC-87 | S3 | No | planned | Planned (D3) — not run |
 | AC-88 | S3 | No | planned | Planned (D3) — not run |
 | AC-89 | S3 | No | planned | Planned (D3) — not run |
-| AC-90 | S1 (Lab 7) | Yes | TEST-101, TEST-103, TEST-104 | Planned (Lab 7) — not run |
-| AC-91 | S1 (Lab 7) | Yes | TEST-102, TEST-103 | Planned (Lab 7) — not run |
+| AC-90 | S1 (Lab 7) | Yes | TEST-103, TEST-105, TEST-106 | Planned (Lab 7) — not run |
+| AC-91 | S1 (Lab 7) | Yes | TEST-104, TEST-105 | Planned (Lab 7) — not run |
 
 ## 4. Version history
 

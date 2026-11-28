@@ -93,7 +93,7 @@ All existing rows are ≥ 0, so no data is rewritten. No stored balance column (
 ## 9. Test considerations
 
 Unit tests for `money.ts` and `balances.ts` (table-driven, no DB). API tests for ownership and
-validation with real DB rows. See `sts.md` TEST-16 – TEST-23; Lab 7 adds TEST-101 – TEST-104.
+validation with real DB rows. See `sts.md` TEST-16 – TEST-23; Lab 7 adds TEST-103 – TEST-106.
 
 ## Version history
 
