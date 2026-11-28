@@ -18,6 +18,7 @@ Status values: **Resolved** (fixed and re-tested), **Accepted** (approved change
 | CR-07 | Maintenance (Dependabot) | Tooling | PR #29 proposes `actions/upload-artifact` 4.6.2 → 7.0.2 (major jump). | Deferred until after the final release to avoid a CI change during the checkpoint. | Open | — | Planned re-test with CI before merge (owner: Chakriwat, by 2026-12-12) |
 | CR-08 | Sprint 2 testing (E2E) | TEST-80 | One full E2E run failed once: the test counted history before the duplicate save had finished. | Test defect: wait for the "Transaction saved" page before counting. Product unchanged. | Resolved | PR #48 (`aeb3a93`) | 4 consecutive full E2E runs passed |
 | CR-09 | Lab 6 UAT (partner team tests MoneyLog) | F-01 – F-08 | UAT plan and handoff ready (`docs/labs/lab-06/uat-plan.md`, PR #38); findings not yet received. | Each finding will be added here as DEF-xx with classification. | Pending | — | — |
+| CR-L7-01 | Lab 7 maintenance (requirement change), Issue #64 | BR-09, D-09, F-04, AC-19 | Users who start with an overdrawn bank/e-wallet account cannot record a negative Cash opening balance. | BR-09 rev. 3.0: Cash opening −10,000,000.00 to 10,000,000.00 THB; loans stay ≥ 0 (D-18). Contract first, then TDD. | Accepted (contract); implementation pending | — | Planned: TEST-101 – TEST-104 + Sprint 1 regression |
 | CR-10 | Lab 7 | — | Lab 7 has not taken place yet. | Findings will be added when received. | Pending | — | — |
 
 ## 2. Approved baseline revisions

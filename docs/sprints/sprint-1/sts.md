@@ -68,6 +68,13 @@ T27,T50 · AC-25 T28,T29,T51 · AC-26 T30,T31 · AC-27 T32 · AC-28 T33,T34 · A
 AC-31 T37,T51 · AC-32 T38 · AC-33 T39 · AC-34 T40 · AC-35 T41,T42,T50 · AC-36 T43 · AC-37 T44 ·
 AC-38 T45 · AC-39 T46 · AC-40 T47 · AC-41 T48 · AC-42 T49. No AC is unmapped.
 
+| TEST-101 | AC-90, BR-09 rev. 3.0 | A | A's own Cash account with one Payment of 500 satang | PUT opening −1,000,000,000 @ 2026-11-01; then PUT −1 | 200 each; stored −1,000,000,000 then −1; `balanceSatang` = opening − 500 | accounts.api.test.ts |
+| TEST-102 | AC-91, AC-19 rev. 2 | A | A's Cash, Loan Given, Loan Taken accounts with opening 1,000 | PUT −1,000,000,001 on Cash; PUT −1 on Loan Given and on Loan Taken | 400 VALIDATION_FAILED, `fields.openingBalanceSatang`; stored values stay 1,000 | accounts.api.test.ts |
+| TEST-103 | AC-90, AC-91 (UI) | C | Accounts page, one Cash and one Loan Taken account | Type "-10,000,000.00" in the Cash opening form and submit; type "-1.00" in the Loan form | Cash: PUT body `openingBalanceSatang` −1,000,000,000; Loan: client error shown, no request sent | client/tests/Accounts.test.tsx |
+| TEST-104 | BR-09 rev. 3.0, BR-13 (data) | A | Migrated test DB | Direct Prisma update: Cash −1,000,000,000; Loan Taken −1; Cash −1,000,000,001 | Cash −1,000,000,000 stored; the other two rejected by the CHECK constraint | accounts.api.test.ts |
+
+*Lab 7 rows (STS v2.0, CR-L7-01, #64).* TEST-22 is unchanged: its "−1" case is on an Expense account and stays 400.
+
 **TDD targets** (test committed failing before implementation): TEST-28/30/32
 (`transaction-rules`), TEST-17/19 (`balances`), TEST-41 (`summary`).
 
@@ -76,3 +83,4 @@ AC-38 T45 · AC-39 T46 · AC-40 T47 · AC-41 T48 · AC-42 T49. No AC is unmapped
 | Version | Date | Change |
 |---|---|---|
 | 1.0 | 2026-11-14 | Planned tests, before implementation. |
+| 2.0 | 2026-11-28 | Lab 7 CR-L7-01 (#64): TEST-101 – TEST-104 added before implementation. RED targets: TEST-101, TEST-103, TEST-104 must fail on the pre-change code `910b662` because the new rule is missing; TEST-102 must pass before and after (guards the unchanged lower bounds). |

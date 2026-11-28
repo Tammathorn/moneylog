@@ -31,7 +31,9 @@ owed by the user; Loan Given = amount owed to the user; Income/Expense = accumul
 
 - Money is integer satang. `parseThb("12.5") = 1250`; more than 2 decimals, signs, letters or
   empty are invalid; formatting `1234567 → "฿12,345.67"`, negative `"-฿5.00"`.
-- Opening balance: `openingBalanceSatang` integer, 0 ≤ value ≤ 1,000,000,000 (10M THB);
+- Opening balance: `openingBalanceSatang` integer. *Rev. 2.0 (Lab 7, BR-09 rev. 3.0, #64):* for a
+  **CASH** account −1,000,000,000 ≤ value ≤ 1,000,000,000 (±10M THB); for **LOAN_GIVEN / LOAN_TAKEN**
+  0 ≤ value ≤ 1,000,000,000. (v1.0: 0 ≤ value ≤ 1,000,000,000 for every type.)
   `openingDate` `YYYY-MM-DD`, valid calendar date, 2000-01-01 ≤ date ≤ today (Asia/Bangkok).
   Otherwise 400 `VALIDATION_FAILED` with `fields`.
 - Account type INCOME or EXPENSE → 422 `OPENING_NOT_ALLOWED`.
@@ -62,12 +64,16 @@ Order: type (CASH, LOAN_TAKEN, LOAN_GIVEN, INCOME, EXPENSE) then name.
 Accounts page: loading line; empty message "No accounts yet." (cannot happen with the seed but is
 handled); error alert on failure; amounts right-aligned in `฿` format; negative values red with
 "(negative)". Opening form: amount + date inputs with labels, client checks format before
-sending, server `fields` shown under inputs, "Saving…" while busy.
+sending, server `fields` shown under inputs, "Saving…" while busy. *Rev. 2.0:* on a Cash account
+the amount may start with a minus sign ("-1,500.00"); on a Loan account a minus sign is refused
+by the client check. `parseThb` itself is unchanged (transactions still reject signs, AC-16).
 
 ## 7. Data
 
-`Account` table (system SDS §2): `openingBalanceSatang INT NOT NULL DEFAULT 0 CHECK (>= 0)`,
-`openingDate DATE NULL`. Created in the `init` migration. No stored balance column (D-02).
+`Account` table (system SDS §2): `openingBalanceSatang INT NOT NULL DEFAULT 0`, `openingDate DATE NULL`.
+Created in the `init` migration with CHECK `0 ≤ value ≤ 1,000,000,000`. *Rev. 2.0:* a new migration
+replaces it with `value BETWEEN -1000000000 AND 1000000000 AND (type = 'CASH' OR value >= 0)`.
+All existing rows are ≥ 0, so no data is rewritten. No stored balance column (D-02).
 
 ## 8. Acceptance criteria
 
@@ -78,16 +84,19 @@ sending, server `fields` shown under inputs, "Saving…" while busy.
 | AC-16 | Money arithmetic is exact: `parseThb` accepts 0–2 decimals and rejects 3 decimals, signs and text; 0.10 + 0.20 THB totals 30 satang; balance = opening + effects. |
 | AC-17 | The Accounts page shows each balance as `฿` with thousands separators and marks a negative balance "(negative)". |
 | AC-18 | Given A's own Cash account, when A sets opening 10,000.00 THB on 2026-11-01, then 200 and the account's `balanceSatang` rises by 1,000,000 compared with before. |
-| AC-19 | Opening on an Income/Expense account → 422 `OPENING_NOT_ALLOWED`; negative, non-integer, > 1,000,000,000, future or malformed date → 400 `VALIDATION_FAILED`; the stored value is unchanged. |
+| AC-19 | *(rev. 2: "negative" = negative on a Loan / Income / Expense account or below −1,000,000,000 on Cash; see AC-90, AC-91)* Opening on an Income/Expense account → 422 `OPENING_NOT_ALLOWED`; negative, non-integer, > 1,000,000,000, future or malformed date → 400 `VALIDATION_FAILED`; the stored value is unchanged. |
 | AC-20 | When A sets an opening balance on B's account id, then 404 `NOT_FOUND`, the same response as a non-existent id, and B's account is unchanged. |
+| AC-90 | *(Lab 7, #64)* Given A's own Cash account, when A sets opening −10,000,000.00 THB (−1,000,000,000 satang) on 2026-11-01, then 200, the stored `openingBalanceSatang` is −1,000,000,000 and `balanceSatang` = −1,000,000,000 + Σ effects; −0.01 THB (−1) is also accepted. |
+| AC-91 | *(Lab 7, #64)* Cash opening −1,000,000,001 → 400 `VALIDATION_FAILED` (`fields.openingBalanceSatang`); Loan Given and Loan Taken opening −1 → 400; the stored value is unchanged in each case. |
 
 ## 9. Test considerations
 
 Unit tests for `money.ts` and `balances.ts` (table-driven, no DB). API tests for ownership and
-validation with real DB rows. See `sts.md` TEST-16 – TEST-23.
+validation with real DB rows. See `sts.md` TEST-16 – TEST-23; Lab 7 adds TEST-101 – TEST-104.
 
 ## Version history
 
 | Version | Date | Change |
 |---|---|---|
 | 1.0 | 2026-11-14 | First contract, before implementation. |
+| 2.0 | 2026-11-28 | Lab 7 CR-L7-01 (#64): BR-09 rev. 3.0 — §3 opening range by type, §6 minus sign for Cash, §7 type-aware CHECK migration, AC-19 rev. 2, new AC-90, AC-91. Written and reviewed before implementation. |
